@@ -41,7 +41,7 @@ final class MainCoordinator: Coordinator {
         
         // Создаем модуль Ленты
         let viewModel = FeedViewModel()
-        let vc = FeedViewController(viewModel: viewModel)
+        let vc = FeedViewController(viewModel: viewModel) // TODO: Щас заглушка
         
         nav.viewControllers = [vc]
         
