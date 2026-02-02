@@ -33,22 +33,33 @@ final class AppCoordinator: Coordinator {
     }
     
     // MARK: - Private Methods
-    private func showMainFlow() {
-        let mainCoordinator = MainCoordinator(navigationController: navigationController)
-        childCoordinators.append(mainCoordinator)
-        mainCoordinator.start()
-    }
-    
     private func showAuthFlow() {
         let authCoordinator = AuthCoordinator(navigationController: navigationController)
         
-        // Когда в AuthCoordinator сработает onFinish, запускаем ленту
         authCoordinator.onFinish = { [weak self] in
-            self?.childCoordinators.removeAll() // Чистим память от старого координатора
-            self?.showMainFlow()
+            self?.childCoordinators.removeAll()
+            self?.showOnboardingFlow()
         }
         
         childCoordinators.append(authCoordinator)
         authCoordinator.start()
+    }
+    
+    private func showOnboardingFlow() {
+        let onboardingCoordinator = OnboardingCoordinator(navigationController: navigationController)
+        
+        onboardingCoordinator.onFinish = { [weak self] in
+            self?.childCoordinators.removeAll()
+            self?.showMainFlow()
+        }
+        
+        childCoordinators.append(onboardingCoordinator)
+        onboardingCoordinator.start()
+    }
+    
+    private func showMainFlow() {
+        let mainCoordinator = MainCoordinator(navigationController: navigationController)
+        childCoordinators.append(mainCoordinator)
+        mainCoordinator.start()
     }
 }

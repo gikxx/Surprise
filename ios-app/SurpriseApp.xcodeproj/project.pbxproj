@@ -10,9 +10,22 @@
 		D51D0B762F214C4400F7D69E /* SurpriseApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SurpriseApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D553E7572F2E4EEC00E8EDA5 /* Exceptions for "SurpriseApp" folder in "SurpriseApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Application/Info.plist,
+			);
+			target = D51D0B752F214C4400F7D69E /* SurpriseApp */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D51D0B782F214C4400F7D69E /* SurpriseApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D553E7572F2E4EEC00E8EDA5 /* Exceptions for "SurpriseApp" folder in "SurpriseApp" target */,
+			);
 			path = SurpriseApp;
 			sourceTree = "<group>";
 		};
