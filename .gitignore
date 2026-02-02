@@ -1,5 +1,18 @@
+# macOS
 .DS_Store
-ios-app/*.xcuserdata
-ios-app/*.xcuserstate
-ios-app/DerivedData/
+
+# Xcode
+*.xcuserstate
+*.xcuserdatad
+*.xcuserdata
+xcuserdata/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+
+# Build
+build/
+DerivedData/
 ios-app/build/
+ios-app/DerivedData/
