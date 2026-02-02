@@ -12,8 +12,16 @@ final class OnboardingCoordinator: Coordinator {
     func start() {
         let vc = OnboardingContainerViewController()
         vc.onFinish = { [weak self] in
-            self?.onFinish?()
+            self?.showFinalOnboarding()
         }
         navigationController.setViewControllers([vc], animated: true)
+    }
+    
+    private func showFinalOnboarding() {
+        let finalVC = FinalOnboardingViewController()
+        finalVC.onCompletion = { [weak self] in
+            self?.onFinish?()
+        }
+        navigationController.pushViewController(finalVC, animated: true)
     }
 }

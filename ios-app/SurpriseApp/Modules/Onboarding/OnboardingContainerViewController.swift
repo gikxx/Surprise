@@ -14,7 +14,7 @@ final class OnboardingContainerViewController: UIViewController {
     
     private let steps: [OnboardingPageModel] = [
     OnboardingPageModel(
-        title: "Что тебя ждет в приложении?",
+        title: "Что тебя ждет\nв приложении",
         description: "",
         imageName: "wewewe",
     ),
@@ -32,11 +32,6 @@ final class OnboardingContainerViewController: UIViewController {
         title: "Коммьюнити",
         description: "Наше приложение – это экосистема, в которой вы можете находиться в постоянном диалоге с новыми брендами и узнавать о российском сообществе еще больше и делиться идеями с друзьями!",
         imageName: "ellipse",
-    ),
-    OnboardingPageModel(
-        title: "Ура!",
-        description: "бегом выбирать подарки",
-        imageName: "star",
     )
     ]
 
