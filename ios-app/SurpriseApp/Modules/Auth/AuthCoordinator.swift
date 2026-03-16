@@ -19,14 +19,22 @@ final class AuthCoordinator: Coordinator {
     private func showWelcome() {
         let vc = WelcomeViewController()
         vc.onRegister = { [weak self] in self?.showRegistration() }
-        vc.onSkip = { [weak self] in self?.onFinish?() } // Уходим на ленту
+        vc.onSkip = { [weak self] in
+            // Запускаем гостевой режим и уходим в основной поток
+            AuthManager.shared.setGuestSession()
+            self?.onFinish?()
+        } // Уходим на ленту
         navigationController.pushViewController(vc, animated: true)
     }
     
     private func showRegistration() {
-        let vc = RegistrationViewController()
+        let viewModel = AuthViewModel(authService: MockAuthService())
+        let vc = RegistrationViewController(viewModel: viewModel)
         vc.onContinue = { [weak self] in self?.showSuccess() }
-        vc.onSkip = { [weak self] in self?.onFinish?() } // Уходим на ленту
+        vc.onSkip = { [weak self] in
+            AuthManager.shared.setGuestSession()
+            self?.onFinish?()
+        } // Уходим на ленту
         navigationController.pushViewController(vc, animated: true)
     }
 

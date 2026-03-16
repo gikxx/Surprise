@@ -4,6 +4,8 @@ final class RegistrationViewController: UIViewController {
     var onContinue: (() -> Void)?
     var onSkip: (() -> Void)?
 
+    private let viewModel: AuthViewModelProtocol
+
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "РЕГИСТРАЦИЯ"
@@ -13,13 +15,24 @@ final class RegistrationViewController: UIViewController {
         return label
     }()
 
-    // Поля с заголовками
+    // Поля с заголовками (контейнеры с UILabel + UITextField внутри)
     private let phoneEmailField = UITextField.createWithLabel(title: "почта/номер телефона")
     private let nameField = UITextField.createWithLabel(title: "имя")
     private let passwordField = UITextField.createWithLabel(title: "пароль", isSecure: true)
 
     private let continueButton = UIButton.createPrimary(title: "продолжить")
     private let skipButton = UIButton.createPrimary(title: "пропустить")
+
+    // MARK: - Init
+    init(viewModel: AuthViewModelProtocol) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -60,6 +73,49 @@ final class RegistrationViewController: UIViewController {
         skipButton.addTarget(self, action: #selector(didTapSkip), for: .touchUpInside)
     }
 
-    @objc private func didTapContinue() { onContinue?() }
-    @objc private func didTapSkip() { onSkip?() }
+    // MARK: - Actions
+    
+    @objc private func didTapContinue() {
+        let emailOrPhone = text(in: phoneEmailField)
+        let name = text(in: nameField)
+        let password = text(in: passwordField)
+        
+        continueButton.isEnabled = false
+        
+        viewModel.register(
+            emailOrPhone: emailOrPhone,
+            name: name,
+            password: password
+        ) { [weak self] result in
+            guard let self = self else { return }
+            
+            self.continueButton.isEnabled = true
+            
+            switch result {
+            case .success:
+                self.onContinue?()
+            case .failure:
+                let message = self.viewModel.errorMessage ?? "Не удалось завершить регистрацию"
+                self.showAlert(message: message)
+            }
+        }
+    }
+    
+    @objc private func didTapSkip() {
+        onSkip?()
+    }
+    
+    // MARK: - Helpers
+    
+    /// Извлекает текст из внутреннего `UITextField` внутри контейнера.
+    private func text(in container: UIView) -> String {
+        let field = container.subviews.first(where: { $0 is UITextField }) as? UITextField
+        return field?.text ?? ""
+    }
+    
+    private func showAlert(message: String) {
+        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Ок", style: .default))
+        present(alert, animated: true)
+    }
 }

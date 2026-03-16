@@ -10,6 +10,15 @@ final class MainCoordinator: Coordinator {
     private let tabBarController: UITabBarController
     private let tapBar = TapBar()
     
+    private let favoritesService = FavoritesService()
+    
+    private lazy var coreDataStack = CoreDataStack.shared
+    private lazy var localDataSource = CoreDataGiftLocalDataSource()
+    private lazy var repository = GiftRepository(
+        local: localDataSource,
+        remote: nil
+    )
+    
     // MARK: - Init
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
@@ -20,7 +29,6 @@ final class MainCoordinator: Coordinator {
     func start() {
         setupTabBarAppearance()
         
-        // Инициализируем страницы
         let feedFlow = createFeedFlow()
         let favoritesFlow = createFavoritesFlow()
         let profileFlow = createProfileFlow()
@@ -39,21 +47,25 @@ final class MainCoordinator: Coordinator {
     private func createFeedFlow() -> UINavigationController {
         let nav = UINavigationController()
         
-        // Создаем модуль Ленты
-        let viewModel = FeedViewModel()
-        let vc = FeedViewController(viewModel: viewModel) // TODO: Щас заглушка
-        
-        nav.viewControllers = [vc]
-        
+        let coordinator = FeedCoordinator(
+            navigationController: nav,
+            repository: repository,
+            favoritesService: favoritesService
+        )
+        childCoordinators.append(coordinator)
+        coordinator.start()
         return nav
     }
     
     private func createFavoritesFlow() -> UINavigationController {
         let nav = UINavigationController()
-        let vc = FavoritesViewController() // TODO: Щас заглушка
-        nav.viewControllers = [vc]
-
         
+        let coordinator = FavoritesCoordinator(
+            navigationController: nav,
+            repository: repository,
+            favoritesService: favoritesService)
+        childCoordinators.append(coordinator)
+        coordinator.start()
         return nav
     }
     
@@ -72,7 +84,6 @@ final class MainCoordinator: Coordinator {
         tabBarController.view.addSubview(tapBar)
         tapBar.translatesAutoresizingMaskIntoConstraints = false
         
-        // Связываем нажатия в TapBar с переключением контроллеров
         tapBar.onTabSelected = { [weak self] index in
             self?.tabBarController.selectedIndex = index
         }
@@ -80,12 +91,10 @@ final class MainCoordinator: Coordinator {
         NSLayoutConstraint.activate([
             tapBar.leadingAnchor.constraint(equalTo: tabBarController.view.leadingAnchor),
             tapBar.trailingAnchor.constraint(equalTo: tabBarController.view.trailingAnchor),
-            // Отступ снизу, чтобы овалы не прилипали к краю экрана
             tapBar.bottomAnchor.constraint(equalTo: tabBarController.view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
             tapBar.heightAnchor.constraint(equalToConstant: 60)
         ])
         
-        // выбрана Лента
         tapBar.updateAppearance(selectedIndex: 0)
     }
     

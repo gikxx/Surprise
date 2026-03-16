@@ -67,6 +67,13 @@ final class TapBar: UIView {
             button.heightAnchor.constraint(equalToConstant: 59).isActive = true
             button.layer.cornerRadius = 29.5
             
+            // Тень
+            button.layer.shadowColor = UIColor.black.cgColor
+            button.layer.shadowOffset = CGSize(width: 0, height: 2) // Смещение вниз
+            button.layer.shadowRadius = 4                        // Размытие
+            button.layer.shadowOpacity = 0.1                     // Прозрачность (0.1 = 10%)
+            button.layer.masksToBounds = false
+            
             button.tag = index
             button.addTarget(self, action: #selector(handleTap(_:)), for: .touchUpInside)
             

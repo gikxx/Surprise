@@ -1,0 +1,232 @@
+{
+  "gifts": [
+    {
+      "id": 1,
+      "name": "Игра Пурпур Отношения",
+      "description": "Игра Пурпур Отношения — «Легальный» способ задать волнующие вопросы, выровнять ожидания и понять друг друга. В колоде 54 Карточки. Основные темы: Дети, Родители, Деньги, Жизнь Вместе, Секс и Отношения, Терапия, Смерть.",
+      "price": 2250,
+      "imageURL": "https://optim.tildacdn.com/tild3363-3039-4434-b466-333939363264/-/format/webp/inst-13.jpg.webp",
+      "storeName": "PURPUR",
+      "storeURL": "https://feelpurpur.com/game-2",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [1]
+    },
+    {
+      "id": 2,
+      "name": "Кольцо EXTRA",
+      "description": "Кольцо ручной работы из эпоксидной смолы, усыпанное стеклянными стразами.",
+      "price": 3900,
+      "imageURL": "https://optim.tildacdn.com/tild3538-6136-4136-b533-643166303637/-/format/webp/IMG_1736.JPG.webp",
+      "storeName": "Major generation",
+      "storeURL": "https://majorgeneration.ru/#!/tproduct/625970714-1497456130776",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [2]
+    },
+    {
+      "id": 3,
+      "name": "Брелок Яблоко",
+      "description": "Осенний урожай яблок в ограниченном количестве. Параметры: ширина 8 см, высота 6 см. Мы вяжем вручную, с любовь. Каждое изделие уникально. Материал: снаружи - 50% хлопок, 50% акрил, внутри - синтепух, бусины - натуральное дерево, камень.",
+      "price": 1700,
+      "imageURL": "https://optim.tildacdn.com/stor3864-3836-4761-b134-623238613730/-/format/webp/10411350.jpg.webp",
+      "storeName": "larechek",
+      "storeURL": "https://larchek-moscow.ru/tproduct/526171063522-brelok-yabloko",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [2]
+    },
+    {
+      "id": 4,
+      "name": "Кружка Голубчик",
+      "description": "Кружка объемом 300 мл. Можно мыть в посудомоечной машине. Если на кружке есть платиновая или золотая роспись - нельзя нагревать в микроволновой печи.",
+      "price": 5400,
+      "imageURL": "https://optim.tildacdn.com/stor3034-3731-4565-b337-363563613834/-/format/webp/75967652.jpg.webp",
+      "storeName": "Поведай",
+      "storeURL": "https://povedaii.com/crockery/tproduct/741690927-249309642192-golubchik",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [2]
+    },
+    {
+      "id": 5,
+      "name": "Скейт доска PASS-PORTDOGU Series - Hollow (8.5)",
+      "description": "Скейт от бренда Октябрь",
+      "price": 7990,
+      "imageURL": "https://static.insales-cdn.com/images/products/1/7785/2563415657/HO-25_PASS-PORT_DOGU_SERIES_HOLLOW_HOLLOW_0.jpg",
+      "storeName": "Октябрь",
+      "storeURL": "https://oktyabrskateshop.com/product/dogu-series-hollow-85",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [3, 5]
+    },
+    {
+      "id": 6,
+      "name": "Мозаика Тюльпан",
+      "description": "Мозаичный постаканник на основе из натурального камня. Используется как подставка под украшения, свечи, вазы. Размер: 10х10 см. Материалы: стеклянная мозаика, мрамор, травертин.",
+      "price": 1600,
+      "imageURL": "https://cdn-sh1.vigbo.com/shops/240432/products/22610918/images/2-fc515759365055c2df5e903fc767b450.jpeg",
+      "storeName": "a.b.c_muse",
+      "storeURL": "https://abc-muse.ru/shop/tylpan-04#0",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [2]
+    },
+    {
+      "id": 7,
+      "name": "Джемпер Клубника",
+      "description": "Ретро джемпер с клубничками. Согреет тебя изнутри и снаружи.",
+      "price": 7150,
+      "imageURL": "https://swht-wear.ru/image/cache/catalog/photo%202024/grsfdfseh-570x570.jpg",
+      "storeName": "БИЧ",
+      "storeURL": "https://swht-wear.ru/index.php?route=product/product&product_id=544",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [2, 3, 4]
+    },
+    {
+      "id": 8,
+      "name": "Кросс боди ФУКСИЯ",
+      "description": "ЭкоМех премиум качества, приближен к норке. Размер: 20х15х7 см. Внутри непромокаемый подклад, карман. Длина ремешка 110 см.",
+      "price": 7000,
+      "imageURL": "https://optim.tildacdn.com/stor3663-3261-4132-a263-373964353035/-/format/webp/90430137.jpg.webp",
+      "storeName": "Take The Bag",
+      "storeURL": "https://takethebag.ru/tproduct/636841703-755080410471-kross-bodi-fuksiya",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [2]
+    },
+    {
+      "id": 9,
+      "name": "Книжная обложка с вышивкой \"Маки\"",
+      "description": "Обложка из льняной ткани с вышивкой. Подходит для книг серий 'Эксклюзивная классика', 'Азбука классика'.",
+      "price": 790,
+      "imageURL": "https://static.insales-cdn.com/images/products/1/6051/814978979/1C016332-FA55-42E9-8BA4-04E8C1422696.jpg",
+      "storeName": "GRIDMIR",
+      "storeURL": "https://gridmir.com/product/knizhnaya-oblozhka-s-vyshivkoy-maki",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [2, 3, 5]
+    },
+    {
+      "id": 10,
+      "name": "Чайная пара \"хуба буба\"",
+      "description": "Керамическая чайная пара в розовом цвете. Объем 400 мл. Можно мыть в посудомоечной машине.",
+      "price": 1990,
+      "imageURL": "https://optim.tildacdn.com/stor6537-3632-4533-a537-313234393863/-/format/webp/27862333.jpg.webp",
+      "storeName": "Котомка",
+      "storeURL": "https://kotomkazero.ru/new/tproduct/819542677-301778338262-chainaya-para-huba-buba",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [2, 1]
+    },
+    {
+      "id": 11,
+      "name": "Подсвечник Иней",
+      "description": "Высота 21 см. Подходит для тонкой и стандартной свечи. Вес: 1000 г.",
+      "price": 2100,
+      "imageURL": "https://optim.tildacdn.com/stor3935-6164-4266-b038-386430646137/-/format/webp/88420897.jpg.webp",
+      "storeName": "voetmoi",
+      "storeURL": "https://voetmoiceramics.ru/vases/tproduct/121740177982-inei",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [2, 1]
+    },
+    {
+      "id": 12,
+      "name": "Набор с камерой perfectionist",
+      "description": "Тот самый красный. В сете: Папш в кейсе «Перфекционист red», латунная закрывашка «Диафрагама», карта с 4-мя дополнительными фильтрами, корд blik.red.cord 4.0.",
+      "price": 17690,
+      "imageURL": "https://optim.tildacdn.com/stor3562-3536-4364-a436-343035353062/-/format/webp/78845629.png.webp",
+      "storeName": "Paper Shoot",
+      "storeURL": "https://papershoot.ru/sets-camera/tproduct/1241615796-577302976172-perfectionist-set",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [2, 3, 5, 6]
+    },
+    {
+      "id": 13,
+      "name": "Коврик для ванной 'Африканский этнос'",
+      "description": "Противоскользящий коврик 52х77 см.",
+      "price": 1259,
+      "imageURL": "https://ir.ozone.ru/s3/multimedia-1-0/wc1000/7670048328.jpg",
+      "storeName": "Joy Arty",
+      "storeURL": "https://www.ozon.ru/product/kovrik-dlya-vannoy-komnaty-i-tualeta-protivoskolzyashchiy-afrikanskiy-etnos-52h77-sm-joyarty-336181976/",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [2, 3]
+    },
+    {
+      "id": 14,
+      "name": "Блокнот «лес»",
+      "description": "Авторский квадратный блокнот 13х13 см. 60 листов, бумага в точку, книжный переплёт. В подарочной коробке.",
+      "price": 2100,
+      "imageURL": "https://optim.tildacdn.com/stor3863-3437-4332-a235-393265326263/-/format/webp/86117020.jpg.webp",
+      "storeName": "solitude",
+      "storeURL": "https://linasolitude.ru/notebooks/tproduct/677837187052-bloknot-les",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [2, 3]
+    },
+    {
+      "id": 15,
+      "name": "Подставка под благовония | Белый Оникс",
+      "description": "Подставка из серии «Омут» с живыми цветами в эпоксидной смоле.",
+      "price": 4100,
+      "imageURL": "https://optim.tildacdn.com/stor6635-3936-4932-b138-633466613361/-/format/webp/77937053.jpg.webp",
+      "storeName": "Murky",
+      "storeURL": "https://market.yandex.ru/card/podstavka-pod-blagovoniya-murky-ovalnoy-formy-belyy-oniks/101763618418",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [2]
+    },
+    {
+      "id": 16,
+      "name": "Сертификат на личный профайлинг-разбор",
+      "description": "Полный профайлинг: особенности психотипа, стиль поведения, восприятие людьми, сильные стороны и уязвимости, совместимость с другими людьми.",
+      "price": 9900,
+      "imageURL": "https://optim.tildacdn.com/tild6532-3162-4662-a662-393539613138/-/format/webp/Rectangle_50.png.webp",
+      "storeName": "Профайлинг от Алисы Зингман",
+      "storeURL": "https://alicezingman.com/profailing#rec829156170",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [2, 1]
+    },
+    {
+      "id": 17,
+      "name": "Плетеный кейс BEIGE для MacBook",
+      "description": "Стильный плетеный кейс для MacBook.",
+      "price": 5000,
+      "imageURL": "https://static.insales-cdn.com/r/rfg8wB7KK24/rs:fit:300:0:1/q:85/plain/images/products/1/6640/766351856/кейс_п3.jpg@webp",
+      "storeName": "KKSPACE",
+      "storeURL": "https://www.kkspace.ru/product/pletenyy-keys-dlya-macbook",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [2, 3, 5]
+    },
+    {
+      "id": 18,
+      "name": "Модель болида Red Bull 1/43",
+      "description": "Масштаб 1/43 (9-12 см). Материал: смола.",
+      "price": 11042,
+      "imageURL": "https://content.scalecar.ru/clipart/i394642/th_u92OeqhKrsuYN4nd-37.jpg",
+      "storeName": "ScaleCarRu",
+      "storeURL": "https://scalecar.ru/models/spark-red-bull-rb19-pobeditel-gp-las-vegas-chempion-mira-maxverstappen-2023-s8934.html",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [3, 5]
+    },
+    {
+      "id": 19,
+      "name": "Настольный биокамин SteelHeat VERONA черный",
+      "description": "Настольный биокамин. Размер: 205x370x210 мм. Время горения до 4 часов.",
+      "price": 10990,
+      "imageURL": "https://vamkamin.ru/wa-data/public/shop/products/74/65/6574/images/35054/35054.970.jpg",
+      "storeName": "Вам Камин",
+      "storeURL": "https://vamkamin.ru/biokaminy/nastolnyye-biokaminy/nastolnyy-biokamin-steelheat-verona-chernyy/",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [2, 3, 1]
+    },
+    {
+      "id": 20,
+      "name": "Фигурка POP Эйс Фрейли Космонавт светящийся",
+      "description": "Эйс Фрейли Космонавт светящийся из группы Кисс. Высота: 10 см.",
+      "price": 3679,
+      "imageURL": "https://funkopoprussia.com/image/data/Music/Kiss/funko-pop-russia-Ace-Frehley-The-Spaceman-GitD-Kiss-123-Walmart-fu64503.png",
+      "storeName": "Funko POP Russia",
+      "storeURL": "https://funkopoprussia.com/music/kiss/ace-frehley-the-spaceman-gitd-funko-pop.html",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "categoryIds": [3, 5]
+    }
+  ],
+  "categories": [
+    { "id": 1, "name": "для пары" },
+    { "id": 2, "name": "для неё" },
+    { "id": 3, "name": "для него" },
+    { "id": 4, "name": "унисекс" },
+    { "id": 5, "name": "23 февраля" },
+    { "id": 6, "name": "14 февраля" }
+  ]
+}
