@@ -1,0 +1,28 @@
+from fastapi import FastAPI
+
+from routers import auth, gifts, favorites
+
+
+def create_app() -> FastAPI:
+    """
+    Application factory.
+
+    Используем фабрику, чтобы упростить конфигурацию
+    и тестирование приложения.
+    """
+    app = FastAPI(
+        title="SURPRISE API",
+        description="Backend for SURPRISE gift picking app",
+        version="0.1.0",
+    )
+
+    # Routers
+    app.include_router(auth.router, prefix="/auth", tags=["auth"])
+    app.include_router(gifts.router, prefix="/gifts", tags=["gifts"])
+    app.include_router(favorites.router, prefix="/favorites", tags=["favorites"])
+
+    return app
+
+
+app = create_app()
+

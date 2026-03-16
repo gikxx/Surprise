@@ -16,3 +16,10 @@ build/
 DerivedData/
 ios-app/build/
 ios-app/DerivedData/
+
+# Python / Backend
+backend/.venv/
+backend/__pycache__/
+backend/.idea/
+__pycache__/
+*.pyc
