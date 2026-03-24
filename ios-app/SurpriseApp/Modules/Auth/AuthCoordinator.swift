@@ -28,7 +28,7 @@ final class AuthCoordinator: Coordinator {
     }
     
     private func showRegistration() {
-        let viewModel = AuthViewModel(authService: MockAuthService())
+        let viewModel = AuthViewModel(authService: AuthService())
         let vc = RegistrationViewController(viewModel: viewModel)
         vc.onContinue = { [weak self] in self?.showSuccess() }
         vc.onSkip = { [weak self] in

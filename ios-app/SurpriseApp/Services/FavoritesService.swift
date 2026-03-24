@@ -3,45 +3,99 @@ import CoreData
 
 // MARK: - FavoritesServiceProtocol
 protocol FavoritesServiceProtocol {
-    func toggleFavorite(id: Int)
+    func toggleFavorite(id: Int) async throws
     func isFavorite(id: Int) -> Bool
     func getFavoriteIds() -> Set<Int>
+    func syncFromServer() async throws
 }
 
-// MARK: - FavoritesService (локальное хранение)
-/// Локальная реализация избранного на основе UserDefaults
+// MARK: - FavoritesService
 final class FavoritesService: FavoritesServiceProtocol {
-    
     private let key = "favorite_ids"
     private var favoriteIds: Set<Int> = []
-    
-    init() {
+    private let networkService: NetworkServiceProtocol
+    private let authManager: AuthManager
+
+    init(
+        networkService: NetworkServiceProtocol = NetworkService(),
+        authManager: AuthManager = .shared
+    ) {
+        self.networkService = networkService
+        self.authManager = authManager
         load()
     }
-    
-    func toggleFavorite(id: Int) {
-        if favoriteIds.contains(id) {
-            favoriteIds.remove(id)
-        } else {
-            favoriteIds.insert(id)
+
+    // MARK: - Public
+
+    func syncFromServer() async throws {
+        guard let token = authManager.token, !token.isEmpty else {
+            return
         }
-        save()
+
+        let endpoint = Endpoint(path: "/favorites", method: .get)
+        do {
+            let response: [FavoriteDTO] = try await networkService.request(endpoint)
+            let serverIds = Set(response.map { $0.id })
+            await MainActor.run {
+                self.favoriteIds = serverIds
+                self.save()
+            }
+        } catch {
+            throw error
+        }
     }
-    
+
+    func toggleFavorite(id: Int) async throws {
+        guard let token = authManager.token, !token.isEmpty else {
+            await MainActor.run {
+                if favoriteIds.contains(id) {
+                    favoriteIds.remove(id)
+                } else {
+                    favoriteIds.insert(id)
+                }
+                save()
+            }
+            return
+        }
+        
+        let endpoint = Endpoint(path: "/favorites/\(id)/toggle", method: .post)
+        do {
+            let _: EmptyResponse = try await networkService.request(endpoint)
+            await MainActor.run {
+                if favoriteIds.contains(id) {
+                    favoriteIds.remove(id)
+                } else {
+                    favoriteIds.insert(id)
+                }
+                save()
+            }
+        } catch {
+            throw error
+        }
+    }
+
     func isFavorite(id: Int) -> Bool {
         favoriteIds.contains(id)
     }
-    
+
     func getFavoriteIds() -> Set<Int> {
         favoriteIds
     }
-    
+
+    // MARK: - Private
+
     private func save() {
         UserDefaults.standard.set(Array(favoriteIds), forKey: key)
     }
-    
+
     private func load() {
         let ids = UserDefaults.standard.array(forKey: key) as? [Int] ?? []
         favoriteIds = Set(ids)
     }
 }
+
+private struct FavoriteDTO: Decodable {
+    let id: Int
+}
+
+private struct EmptyResponse: Decodable {}

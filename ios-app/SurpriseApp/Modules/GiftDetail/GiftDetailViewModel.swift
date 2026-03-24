@@ -24,9 +24,18 @@ final class GiftDetailViewModel: GiftDetailViewModelProtocol {
     }
     
     func toggleFavorite() {
-        favoritesService.toggleFavorite(id: gift.id)
-        
-        gift.isFavorite = favoritesService.isFavorite(id: gift.id)
-        onStateChanged?()
+        Task {
+            do {
+                try await favoritesService.toggleFavorite(id: gift.id)
+                await MainActor.run {
+                    gift.isFavorite = favoritesService.isFavorite(id: gift.id)
+                    onStateChanged?()
+                }
+            } catch {
+                await MainActor.run {
+                    print("Failed to toggle favorite: \(error)")
+                }
+            }
+        }
     }
 }

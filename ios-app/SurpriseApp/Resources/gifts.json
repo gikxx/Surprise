@@ -181,7 +181,7 @@
       "name": "Плетеный кейс BEIGE для MacBook",
       "description": "Стильный плетеный кейс для MacBook.",
       "price": 5000,
-      "imageURL": "https://static.insales-cdn.com/r/rfg8wB7KK24/rs:fit:300:0:1/q:85/plain/images/products/1/6640/766351856/кейс_п3.jpg@webp",
+      "imageURL": "https://static.insales-cdn.com/r/rfg8wB7KK24/rs:fit:300:0:1/q:85/plain/images/products/1/6640/766351856/кейс_п3.jpg@webp",
       "storeName": "KKSPACE",
       "storeURL": "https://www.kkspace.ru/product/pletenyy-keys-dlya-macbook",
       "createdAt": "2024-01-01T00:00:00Z",
@@ -229,4 +229,5 @@
     { "id": 5, "name": "23 февраля" },
     { "id": 6, "name": "14 февраля" }
   ]
-}
+
+

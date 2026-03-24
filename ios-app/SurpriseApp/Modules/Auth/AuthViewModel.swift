@@ -28,7 +28,7 @@ final class AuthViewModel: AuthViewModelProtocol {
     private let authService: AuthServiceProtocol
     
     // MARK: - Init
-    init(authService: AuthServiceProtocol = MockAuthService()) {
+    init(authService: AuthServiceProtocol = AuthService()) {
         self.authService = authService
     }
     

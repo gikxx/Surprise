@@ -13,10 +13,10 @@ class Settings(BaseSettings):
     """
 
     database_url: AnyUrl = (
-        "postgresql+asyncpg://postgres:postgres@localhost:5432/surprise"  # локальный/докер postgres
+        "postgresql+asyncpg://postgres:postgres@localhost:5432/surprise"  
     )
 
-    jwt_secret_key: str = "change-me-in-env"
+    jwt_secret_key: str = "dev_secret_key"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
 

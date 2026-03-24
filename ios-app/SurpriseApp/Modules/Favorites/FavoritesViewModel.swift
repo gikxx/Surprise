@@ -29,6 +29,14 @@ final class FavoritesViewModel: FavoritesViewModelProtocol {
     
     func loadFavorites() {
         Task {
+            if !AuthManager.shared.isGuest {
+                do {
+                    try await favoritesService.syncFromServer()
+                } catch {
+                    print("❌ Failed to sync favorites: \(error)")
+                }
+            }
+            
             do {
                 let allGifts = try await repository.getAllGifts()
                 let favoriteIds = favoritesService.getFavoriteIds()
@@ -51,9 +59,20 @@ final class FavoritesViewModel: FavoritesViewModelProtocol {
     }
     
     func removeFromFavorites(_ giftId: Int) {
-        favoritesService.toggleFavorite(id: giftId)
-        items.removeAll { $0.id == giftId }
-        isEmpty = items.isEmpty
-        onStateChanged?()
+        Task {
+           do {
+               try await favoritesService.toggleFavorite(id: giftId)
+               await MainActor.run {
+                   self.items.removeAll { $0.id == giftId }
+                   self.isEmpty = self.items.isEmpty
+                   self.onStateChanged?()
+               }
+           } catch {
+               print("❌ Failed to remove favorite: \(error)")
+               await MainActor.run {
+                   self.onStateChanged?()
+               }
+           }
+       }
     }
 }

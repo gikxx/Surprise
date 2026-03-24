@@ -27,7 +27,7 @@ protocol AuthServiceProtocol {
     func startGuestSession() async -> User
 }
 
-// MARK: - AuthService (реальная реализация через NetworkService)
+// MARK: - AuthService
 final class AuthService: AuthServiceProtocol {
     
     private let networkService: NetworkServiceProtocol
@@ -41,12 +41,15 @@ final class AuthService: AuthServiceProtocol {
         name: String,
         password: String
     ) async throws -> AuthResponse {
-        // TODO: заменить валидацию и эндпоинт на фактические с бэкенда.
         guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw AuthError.validationFailed("Имя не может быть пустым")
         }
         guard password.count >= 6 else {
             throw AuthError.validationFailed("Пароль должен быть не короче 6 символов")
+        }
+        
+        guard isValidEmailOrPhone(emailOrPhone) else {
+            throw AuthError.validationFailed("Введите корректный email или номер телефона")
         }
         
         let endpoint = Endpoint(
@@ -62,6 +65,7 @@ final class AuthService: AuthServiceProtocol {
         do {
             let response: AuthResponse = try await networkService.request(endpoint)
             AuthManager.shared.setSession(user: response.user, token: response.token, isGuest: false)
+            print("✅ Token saved: \(AuthManager.shared.token ?? "nil")")
             return response
         } catch let error as NetworkError {
             throw AuthError.network(error)
@@ -79,6 +83,9 @@ final class AuthService: AuthServiceProtocol {
         }
         guard password.count >= 6 else {
             throw AuthError.validationFailed("Пароль должен быть не короче 6 символов")
+        }
+        guard isValidEmailOrPhone(emailOrPhone) else {
+            throw AuthError.validationFailed("Введите корректный email или номер телефона")
         }
         
         let endpoint = Endpoint(
@@ -111,6 +118,17 @@ final class AuthService: AuthServiceProtocol {
         )
         AuthManager.shared.setGuestSession()
         return guest
+    }
+    
+    private func isValidEmailOrPhone(_ value: String) -> Bool {
+        if value.contains("@") {
+            let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
+            let emailPredicate = NSPredicate(format: "SELF MATCHES %@", emailRegex)
+            return emailPredicate.evaluate(with: value)
+        } else {
+            let digits = value.filter { $0.isNumber }
+            return digits.count >= 10
+        }
     }
 }
 
