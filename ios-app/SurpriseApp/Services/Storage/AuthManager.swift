@@ -6,6 +6,7 @@ final class AuthManager {
     
     private let tokenKey = "auth_token"
     private let userIdKey = "auth_user_id"
+    private let userNameKey = "auth_user_name"
     private let isGuestKey = "auth_is_guest"
     
     /// Токен авторизации текущего пользователя.
@@ -28,6 +29,11 @@ final class AuthManager {
             }
         }
     }
+    
+    var userName: String? {
+        get { UserDefaults.standard.string(forKey: userNameKey) }
+        set { UserDefaults.standard.set(newValue, forKey: userNameKey) }
+    }
 
     /// Флаг гостевого режима (пользователь пропустил регистрацию).
     var isGuest: Bool {
@@ -42,18 +48,21 @@ final class AuthManager {
     func setSession(user: User, token: String, isGuest: Bool) {
         self.token = token
         self.userId = user.id
+        self.userName = user.name
         self.isGuest = isGuest
     }
     
     func setGuestSession() {
         token = nil
         userId = nil
+        userName = nil
         isGuest = true
     }
     
     func logout() {
         token = nil
         userId = nil
+        userName = nil
         isGuest = false
     }
 }

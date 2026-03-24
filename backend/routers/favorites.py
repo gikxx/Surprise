@@ -26,7 +26,7 @@ async def get_favorites(
     result = await session.execute(stmt)
     gifts = result.scalars().all()
     return [
-        GiftRead.from_orm(gift).copy(update={"is_favorite": True})
+        GiftRead.model_validate(gift, from_attributes=True).model_copy(update={"is_favorite": True})
         for gift in gifts
     ]
 
@@ -54,6 +54,6 @@ async def toggle_favorite(
     await session.commit()
     await session.refresh(gift)
 
-    return GiftRead.from_orm(gift).copy(update={"is_favorite": is_favorite})
+    return GiftRead.model_validate(gift, from_attributes=True).model_copy(update={"is_favorite": is_favorite})
 
 

@@ -9,12 +9,17 @@ final class CoreDataGiftLocalDataSource: GiftLocalDataSourceProtocol {
     // MARK: - Fetch All
     
     func fetchGifts() async throws -> [Gift] {
+        print("📦 [CoreData] fetchGifts called")
         let context = coreDataStack.newBackgroundContext()
         
         return try await context.perform {
             let request: NSFetchRequest<GiftEntity> = GiftEntity.fetchRequest()
             let entities = try context.fetch(request)
-            return entities.map { self.convertToGift(entity: $0) }
+            print("✅ [CoreData] fetched \(entities.count) entities")
+            
+            let gifts = entities.map { self.convertToGift(entity: $0) }
+            print("🔄 [CoreData] converted to \(gifts.count) Gift models")
+            return gifts
         }
     }
     

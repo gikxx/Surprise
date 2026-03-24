@@ -49,12 +49,14 @@ protocol NetworkServiceProtocol {
 
 // MARK: - Network Service
 final class NetworkService: NetworkServiceProtocol {
-    /// Базовый URL API для dev-сервера FastAPI.
-    /// При запуске бекенда локально через Uvicorn используем http://localhost:8000.
-    private let baseURL = "http://localhost:8000"
+    private let baseURL: String
     private let session: URLSession
 
-    init(session: URLSession = .shared) {
+    init(
+        baseURL: String = AppConfig.shared.apiBaseURL,
+        session: URLSession = .shared
+    ) {
+        self.baseURL = baseURL
         self.session = session
     }
     
@@ -77,6 +79,7 @@ final class NetworkService: NetworkServiceProtocol {
         
         // Добавляем токен если есть
         if let token = AuthManager.shared.token {
+            print("🔑 [Network] Sending request to \(url) with token: \(token.prefix(20))...")
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         
@@ -96,7 +99,9 @@ final class NetworkService: NetworkServiceProtocol {
             switch httpResponse.statusCode {
             case 200...299:
                 do {
-                    return try JSONDecoder().decode(T.self, from: data)
+                    let decoder = JSONDecoder()
+                    decoder.dateDecodingStrategy = .iso8601
+                    return try decoder.decode(T.self, from: data)
                 } catch {
                     throw NetworkError.decodingError
                 }

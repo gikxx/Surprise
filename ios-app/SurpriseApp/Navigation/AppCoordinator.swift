@@ -28,7 +28,11 @@ final class AppCoordinator: Coordinator {
         window.rootViewController = navigationController
         window.makeKeyAndVisible()
         
-        // Решаем, какой поток запустить
+        if AuthManager.shared.isLoggedIn {
+            showMainFlow()
+            return
+        }
+        
         showAuthFlow()
     }
     

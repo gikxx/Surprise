@@ -13,7 +13,7 @@ from models import User
 from schemas.user import TokenData
 from settings import get_settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 oauth2_scheme = HTTPBearer()
 
 
@@ -31,6 +31,7 @@ def create_access_token(data: dict[str, Any], expires_delta: Optional[timedelta]
     expire = datetime.utcnow() + (
         expires_delta or timedelta(minutes=settings.access_token_expire_minutes)
     )
+    print(f"🔧 Creating token with expire: {expire.isoformat()}, now: {datetime.utcnow().isoformat()}")
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
         to_encode,
@@ -46,16 +47,20 @@ async def get_current_user(
 ) -> User:
     settings = get_settings()
     token = credentials.credentials
+    print(f"🔧 Current server time (UTC): {datetime.utcnow().isoformat()}")
+    print(f"🔍 Received token: {token[:30]}...")
     try:
         payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
         user_id: int | None = payload.get("sub")
         if user_id is None:
+            print("❌ Invalid token payload: missing sub")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token payload",
             )
         token_data = TokenData(user_id=user_id)
-    except JWTError:
+    except JWTError as e:
+        print(f"❌ JWT decode error: {e}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",

@@ -17,7 +17,6 @@ async def register(
 ) -> AuthResponse:
     """
     Упрощённая регистрация пользователя.
-
     Полноценная регистрация:
     - проверка уникальности email/phone
     - хэширование пароля
@@ -48,7 +47,7 @@ async def register(
     await session.commit()
     await session.refresh(user)
 
-    token = create_access_token({"sub": user.id})
+    token = create_access_token({"sub": str(user.id)})
 
     return AuthResponse(
         user=UserRead.from_orm(user),
@@ -80,7 +79,7 @@ async def login(
             detail="Incorrect email/phone or password",
         )
 
-    token = create_access_token({"sub": user.id})
+    token = create_access_token({"sub": str(user.id)})
 
     return AuthResponse(
         user=UserRead.from_orm(user),

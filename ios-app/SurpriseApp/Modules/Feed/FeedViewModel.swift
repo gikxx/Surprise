@@ -39,7 +39,6 @@ final class FeedViewModel: FeedViewModelProtocol {
     private let favoritesService: FavoritesServiceProtocol
     private var allGifts: [Gift] = []
     
-    // Параметры для будущей пагинации
     private var isLoadingMore: Bool = false
     
     // MARK: - Callbacks
@@ -114,17 +113,27 @@ final class FeedViewModel: FeedViewModelProtocol {
     }
     
     func toggleFavorite(for giftId: Int) {
-        favoritesService.toggleFavorite(id: giftId)
-        
-        let updated = gifts.map { gift -> Gift in
-            var copy = gift
-            if gift.id == giftId {
-                copy.isFavorite = favoritesService.isFavorite(id: giftId)
+        Task {
+                do {
+                    try await favoritesService.toggleFavorite(id: giftId)
+                    let updated = gifts.map { gift -> Gift in
+                        var copy = gift
+                        if gift.id == giftId {
+                            copy.isFavorite = favoritesService.isFavorite(id: giftId)
+                        }
+                        return copy
+                    }
+                    await MainActor.run {
+                        updateGiftsState(updated)
+                        self.allGifts = updated
+                    }
+                } catch {
+                    await MainActor.run {
+                        errorMessage = "Не удалось обновить избранное"
+                        onStateChanged?()
+                    }
+                }
             }
-            return copy
-        }
-        
-        updateGiftsState(updated)
     }
     
     func searchGifts(query: String) {

@@ -158,6 +158,8 @@ final class FeedViewController: UIViewController {
         let label = UILabel()
         let attributedString = NSMutableAttributedString()
         
+        let userName = AuthManager.shared.userName ?? "Гость"
+        
         let helloText = NSAttributedString(
             string: "Привет, ",
             attributes: [
@@ -167,7 +169,7 @@ final class FeedViewController: UIViewController {
         )
         
         let nameText = NSAttributedString(
-            string: "Карина! ",
+            string: userName,
             attributes: [
                 .font: UIFont.miama(size: 28),
                 .foregroundColor: UIColor.appPrimary

@@ -22,7 +22,7 @@ class Gift(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text)
     price: Mapped[float] = mapped_column(Float, nullable=False)
-    category: Mapped[str] = mapped_column(String(100), index=True)
+    categories: Mapped[str] = mapped_column(String(255))
     image_url: Mapped[str] = mapped_column(String(1024), nullable=False)
     gallery_image_urls: Mapped[Optional[str]] = mapped_column(Text) 
     tags: Mapped[Optional[str]] = mapped_column(Text) 

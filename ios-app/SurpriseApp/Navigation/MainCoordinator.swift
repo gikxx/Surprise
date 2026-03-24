@@ -10,13 +10,19 @@ final class MainCoordinator: Coordinator {
     private let tabBarController: UITabBarController
     private let tapBar = TapBar()
     
-    private let favoritesService = FavoritesService()
+    private lazy var networkService = NetworkService()
+    private lazy var authManager = AuthManager.shared
+    private lazy var favoritesService = FavoritesService(
+        networkService: networkService,
+        authManager: authManager
+    )
     
     private lazy var coreDataStack = CoreDataStack.shared
     private lazy var localDataSource = CoreDataGiftLocalDataSource()
+    private lazy var remoteDataSource = GiftRemoteDataSource()
     private lazy var repository = GiftRepository(
         local: localDataSource,
-        remote: nil
+        remote: remoteDataSource
     )
     
     // MARK: - Init
