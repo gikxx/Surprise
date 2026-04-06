@@ -46,7 +46,9 @@ final class FavoritesCoordinator: Coordinator {
                     viewModel.loadFavorites()
                 }
             } catch {
+                #if DEBUG
                 print("Failed to load gifts:", error)
+                #endif
             }
         }
     }

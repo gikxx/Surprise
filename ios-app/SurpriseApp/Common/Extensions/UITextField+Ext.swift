@@ -15,6 +15,8 @@ extension UITextField {
         field.layer.cornerRadius = 21.5
         field.isSecureTextEntry = isSecure
         field.autocapitalizationType = .none
+        field.keyboardAppearance = .default
+        field.tintColor = .appPrimary
         
         [label, field].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -30,8 +32,8 @@ extension UITextField {
         field.rightViewMode = .always
         
         // Устанавливаем шрифт для самого текста внутри поля
-        field.font = .systemFont(ofSize: 16)
-        field.textColor = .appTextMain
+        field.font = .systemFont(ofSize: 17)
+        field.textColor = UIColor.black.withAlphaComponent(0.85)
         
         
         NSLayoutConstraint.activate([

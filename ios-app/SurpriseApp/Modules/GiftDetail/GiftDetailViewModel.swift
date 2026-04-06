@@ -33,7 +33,9 @@ final class GiftDetailViewModel: GiftDetailViewModelProtocol {
                 }
             } catch {
                 await MainActor.run {
+                    #if DEBUG
                     print("Failed to toggle favorite: \(error)")
+                    #endif
                 }
             }
         }

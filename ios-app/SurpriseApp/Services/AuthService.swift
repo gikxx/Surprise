@@ -65,7 +65,6 @@ final class AuthService: AuthServiceProtocol {
         do {
             let response: AuthResponse = try await networkService.request(endpoint)
             AuthManager.shared.setSession(user: response.user, token: response.token, isGuest: false)
-            print("✅ Token saved: \(AuthManager.shared.token ?? "nil")")
             return response
         } catch let error as NetworkError {
             throw AuthError.network(error)

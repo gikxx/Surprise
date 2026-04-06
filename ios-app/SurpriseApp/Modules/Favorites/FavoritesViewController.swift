@@ -45,6 +45,11 @@ final class FavoritesViewController: UIViewController {
         viewModel.loadFavorites()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        updateCollectionLayout()
+    }
+    
     private func setupHeader() {
         let containerView = UIView()
         
@@ -80,14 +85,10 @@ final class FavoritesViewController: UIViewController {
         layout.minimumLineSpacing = 16
         layout.minimumInteritemSpacing = 16
         
-        let totalSpacing = layout.sectionInset.left + layout.sectionInset.right + layout.minimumInteritemSpacing
-        let width = (view.frame.width - totalSpacing) / 2
-        
-        layout.itemSize = CGSize(width: width, height: width * 1.25)
-        
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.contentInsetAdjustmentBehavior = .always
         collectionView.register(FavoriteGiftCell.self, forCellWithReuseIdentifier: FavoriteGiftCell.identifier)
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -123,6 +124,31 @@ final class FavoritesViewController: UIViewController {
     private func applyState() {
         collectionView.reloadData()
         emptyLabel.isHidden = !viewModel.isEmpty
+    }
+    
+    private func updateCollectionLayout() {
+        guard let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
+        
+        let bottomInset: CGFloat = 110
+        if collectionView.contentInset.bottom != bottomInset {
+            collectionView.contentInset.bottom = bottomInset
+            collectionView.verticalScrollIndicatorInsets.bottom = bottomInset
+        }
+        
+        let sideInset: CGFloat = 16
+        let isRegularWidth = traitCollection.horizontalSizeClass == .regular
+        let columns: CGFloat = isRegularWidth ? 3 : 2
+        let interItemSpacing: CGFloat = 16
+        let usableWidth = min(view.bounds.width, isRegularWidth ? 980 : view.bounds.width)
+        let horizontalPadding = max((view.bounds.width - usableWidth) / 2, sideInset)
+        
+        layout.sectionInset = UIEdgeInsets(top: 16, left: horizontalPadding, bottom: 16, right: horizontalPadding)
+        layout.minimumInteritemSpacing = interItemSpacing
+        layout.minimumLineSpacing = 16
+        
+        let totalSpacing = horizontalPadding * 2 + interItemSpacing * (columns - 1)
+        let width = (view.bounds.width - totalSpacing) / columns
+        layout.itemSize = CGSize(width: width, height: width * 1.25 + 8 + 45)
     }
 }
 
@@ -163,11 +189,7 @@ extension FavoritesViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView,
                        layout collectionViewLayout: UICollectionViewLayout,
                        sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
-        let totalSpacing: CGFloat = 48
-        let width = (view.frame.width - totalSpacing) / 2
-        
-        let height = width * 1.25 + 8 + 45
-        return CGSize(width: width, height: height)
+        let layout = collectionViewLayout as? UICollectionViewFlowLayout
+        return layout?.itemSize ?? .zero
     }
 }

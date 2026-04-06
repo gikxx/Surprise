@@ -42,7 +42,9 @@ final class CoreDataStack {
             do {
                 try context.save()
             } catch {
+                #if DEBUG
                 print("Failed to save context: \(error)")
+                #endif
             }
         }
     }

@@ -63,7 +63,9 @@ final class FeedViewModel: FeedViewModelProtocol {
                 self.onStateChanged?()
             }
         } catch {
+            #if DEBUG
             print("❌ Failed to load categories: \(error)")
+            #endif
             await MainActor.run {
                 self.categories = ["все"]
                 self.onStateChanged?()

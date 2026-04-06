@@ -38,12 +38,14 @@ final class RegistrationViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .appBackground
         setupUI()
+        setupKeyboardHandling()
     }
 
     private func setupUI() {
         let fieldsStack = UIStackView(arrangedSubviews: [phoneEmailField, nameField, passwordField])
         fieldsStack.axis = .vertical
-        fieldsStack.spacing = 25
+        fieldsStack.spacing = 16
+        fieldsStack.distribution = .fillEqually
 
         [titleLabel, fieldsStack, continueButton, skipButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -51,26 +53,46 @@ final class RegistrationViewController: UIViewController {
         }
 
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 42),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-
-            fieldsStack.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 50),
+            
+            fieldsStack.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 30),
             fieldsStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
             fieldsStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
+            fieldsStack.heightAnchor.constraint(equalToConstant: 245),
 
-            continueButton.bottomAnchor.constraint(equalTo: skipButton.topAnchor, constant: -16),
+            continueButton.topAnchor.constraint(equalTo: fieldsStack.bottomAnchor, constant: 26),
             continueButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             continueButton.widthAnchor.constraint(equalToConstant: 220),
             continueButton.heightAnchor.constraint(equalToConstant: 55),
 
-            skipButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40),
+            skipButton.topAnchor.constraint(equalTo: continueButton.bottomAnchor, constant: 16),
             skipButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             skipButton.widthAnchor.constraint(equalToConstant: 220),
-            skipButton.heightAnchor.constraint(equalToConstant: 55)
+            skipButton.heightAnchor.constraint(equalToConstant: 55),
+            skipButton.bottomAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24)
         ])
 
         continueButton.addTarget(self, action: #selector(didTapContinue), for: .touchUpInside)
         skipButton.addTarget(self, action: #selector(didTapSkip), for: .touchUpInside)
+    }
+    
+    private func setupKeyboardHandling() {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+        
+        let fields = inputTextFields()
+        for (index, field) in fields.enumerated() {
+            field.delegate = self
+            field.returnKeyType = (index == fields.count - 1) ? .done : .next
+        }
+    }
+    
+    private func inputTextFields() -> [UITextField] {
+        [phoneEmailField, nameField, passwordField].compactMap { container in
+            container.subviews.first(where: { $0 is UITextField }) as? UITextField
+        }
     }
 
     // MARK: - Actions
@@ -105,6 +127,10 @@ final class RegistrationViewController: UIViewController {
         onSkip?()
     }
     
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
+    }
+    
     // MARK: - Helpers
     
     /// Извлекает текст из внутреннего `UITextField` внутри контейнера.
@@ -117,5 +143,24 @@ final class RegistrationViewController: UIViewController {
         let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Ок", style: .default))
         present(alert, animated: true)
+    }
+}
+
+extension RegistrationViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        let fields = inputTextFields()
+        guard let currentIndex = fields.firstIndex(of: textField) else {
+            textField.resignFirstResponder()
+            return true
+        }
+        
+        let nextIndex = currentIndex + 1
+        if nextIndex < fields.count {
+            fields[nextIndex].becomeFirstResponder()
+        } else {
+            textField.resignFirstResponder()
+        }
+        
+        return true
     }
 }

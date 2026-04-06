@@ -22,7 +22,7 @@ final class WelcomeViewController: UIViewController {
         return iv
     }()
 
-    private let registerButton = UIButton.createPrimary(title: "зарегаться")
+    private let registerButton = UIButton.createPrimary(title: "регистрация")
     private let skipButton = UIButton.createPrimary(title: "пропустить")
 
     override func viewDidLoad() {

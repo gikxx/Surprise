@@ -143,15 +143,17 @@ final class OnboardingPageView: UIView {
             textContainer.trailingAnchor.constraint(equalTo: trailingAnchor),
             textContainer.bottomAnchor.constraint(equalTo: bottomAnchor),
             
-            titleLabel.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 400),
+            titleLabel.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 110),
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 35),
             titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -30),
             
             descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 5),
             descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 35),
-            descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -40)
+            descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -40),
+            descriptionLabel.bottomAnchor.constraint(lessThanOrEqualTo: safeAreaLayoutGuide.bottomAnchor, constant: -24)
         ])
     }
+    
 }
 
 // MARK: - Model

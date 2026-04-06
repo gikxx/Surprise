@@ -5,7 +5,7 @@ struct Gift: Codable, Identifiable {
     let id: Int
     let name: String
     let description: String?
-    let price: Double
+    let price: Int
     let imageURL: String
     let storeName: String?
     let storeURL: String?

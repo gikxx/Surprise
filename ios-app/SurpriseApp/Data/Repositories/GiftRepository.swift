@@ -24,47 +24,34 @@ final class GiftRepository: GiftRepositoryProtocol {
     // MARK: - All Gifts
     
     func getAllGifts() async throws -> [Gift] {
-        print("📁 [Repository] getAllGifts called")
         if let remoteDataSource {
             do {
                 let gifts = try await remoteDataSource.fetchAll(page: 1, perPage: 200)
-                print("✅ [Repository] got \(gifts.count) gifts from remote")
                 return gifts
             } catch {
-                print("⚠️ [Repository] remote failed, falling back to local")
                 let gifts = try await localDataSource.fetchGifts()
-                print("✅ [Repository] got \(gifts.count) gifts from local")
                 return gifts
             }
         }
         let gifts = try await localDataSource.fetchGifts()
-        print("✅ [Repository] got \(gifts.count) gifts from local (no remote)")
         return gifts
     }
     
     // MARK: - Recommended
     
     func getRecommendedGifts() async throws -> [Gift] {
-        print("⭐️ [Repo] getRecommendedGifts")
         
         if let remoteDataSource {
-            print("📡 [Repo] remoteDataSource exists, trying...")
             do {
                 let gifts = try await remoteDataSource.fetchRecommended(page: 1, perPage: 50)
-                print("✅ [Repo] got \(gifts.count) gifts from remote")
                 return gifts
             } catch {
-                print("⚠️ [Repo] remote failed: \(error.localizedDescription)")
-                print("📦 [Repo] falling back to local")
                 let gifts = try await getAllGifts()
-                print("✅ [Repo] got \(gifts.count) gifts from local (fallback)")
                 return gifts.sorted { $0.createdAt > $1.createdAt }
             }
         }
         
-        print("📦 [Repo] no remote, using local")
         let gifts = try await getAllGifts()
-        print("✅ [Repo] got \(gifts.count) gifts from local")
         return gifts.sorted { $0.createdAt > $1.createdAt }
     }
     

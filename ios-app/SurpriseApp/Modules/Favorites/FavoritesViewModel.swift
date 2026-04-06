@@ -33,7 +33,9 @@ final class FavoritesViewModel: FavoritesViewModelProtocol {
                 do {
                     try await favoritesService.syncFromServer()
                 } catch {
+                    #if DEBUG
                     print("❌ Failed to sync favorites: \(error)")
+                    #endif
                 }
             }
             
@@ -53,7 +55,9 @@ final class FavoritesViewModel: FavoritesViewModelProtocol {
                     self.onStateChanged?()
                 }
             } catch {
+                #if DEBUG
                 print("❌ Failed to load favorites: \(error)")
+                #endif
             }
         }
     }
@@ -68,7 +72,9 @@ final class FavoritesViewModel: FavoritesViewModelProtocol {
                    self.onStateChanged?()
                }
            } catch {
+               #if DEBUG
                print("❌ Failed to remove favorite: \(error)")
+               #endif
                await MainActor.run {
                    self.onStateChanged?()
                }

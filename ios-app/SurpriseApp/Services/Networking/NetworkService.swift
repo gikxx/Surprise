@@ -9,31 +9,18 @@ enum HTTPMethod: String {
 }
 
 // MARK: - Endpoint
-/// Описание конечной точки API, используется для типизированных запросов.
 struct Endpoint {
     let path: String
     let method: HTTPMethod
     var queryItems: [URLQueryItem] = []
     var bodyParameters: [String: Any]? = nil
-
-    init(
-        path: String,
-        method: HTTPMethod = .get,
-        queryItems: [URLQueryItem] = [],
-        bodyParameters: [String: Any]? = nil
-    ) {
-        self.path = path
-        self.method = method
-        self.queryItems = queryItems
-        self.bodyParameters = bodyParameters
-    }
 }
 
 // MARK: - Network Error
 enum NetworkError: Error {
     case invalidURL
     case noData
-    case decodingError
+    case decodingError(String)  
     case serverError(String)
     case unauthorized
     case noConnection
@@ -42,9 +29,7 @@ enum NetworkError: Error {
 
 // MARK: - Network Service Protocol
 protocol NetworkServiceProtocol {
-    func request<T: Decodable>(
-        _ endpoint: Endpoint
-    ) async throws -> T
+    func request<T: Decodable>(_ endpoint: Endpoint) async throws -> T
 }
 
 // MARK: - Network Service
@@ -60,9 +45,7 @@ final class NetworkService: NetworkServiceProtocol {
         self.session = session
     }
     
-    func request<T: Decodable>(
-        _ endpoint: Endpoint
-    ) async throws -> T {
+    func request<T: Decodable>(_ endpoint: Endpoint) async throws -> T {
         guard var components = URLComponents(string: baseURL + endpoint.path) else {
             throw NetworkError.invalidURL
         }
@@ -77,13 +60,10 @@ final class NetworkService: NetworkServiceProtocol {
         request.httpMethod = endpoint.method.rawValue
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        // Добавляем токен если есть
         if let token = AuthManager.shared.token {
-            print("🔑 [Network] Sending request to \(url) with token: \(token.prefix(20))...")
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         
-        // Параметры для POST/PUT
         if let parameters = endpoint.bodyParameters,
            endpoint.method == .post || endpoint.method == .put {
             request.httpBody = try JSONSerialization.data(withJSONObject: parameters)
@@ -92,6 +72,8 @@ final class NetworkService: NetworkServiceProtocol {
         do {
             let (data, response) = try await session.data(for: request)
             
+            let dataString = String(data: data, encoding: .utf8) ?? ""
+            
             guard let httpResponse = response as? HTTPURLResponse else {
                 throw NetworkError.noData
             }
@@ -99,11 +81,11 @@ final class NetworkService: NetworkServiceProtocol {
             switch httpResponse.statusCode {
             case 200...299:
                 do {
-                    let decoder = JSONDecoder()
-                    decoder.dateDecodingStrategy = .iso8601
+                    let decoder = JSONDecoder.surpriseDecoder
                     return try decoder.decode(T.self, from: data)
+                    
                 } catch {
-                    throw NetworkError.decodingError
+                    throw NetworkError.decodingError(error.localizedDescription)
                 }
             case 401:
                 throw NetworkError.unauthorized
@@ -122,4 +104,3 @@ final class NetworkService: NetworkServiceProtocol {
         }
     }
 }
-

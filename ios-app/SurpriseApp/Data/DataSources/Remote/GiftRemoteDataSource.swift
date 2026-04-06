@@ -87,6 +87,7 @@ private struct GiftReadDTO: Decodable {
     let price: Int
     let categories: [String]
     let imageURL: String
+    let galleryImageURLs: [String]?
     let storeName: String?
     let storeURL: String?
     let createdAt: Date
@@ -95,6 +96,7 @@ private struct GiftReadDTO: Decodable {
     enum CodingKeys: String, CodingKey {
         case id, name, description, price, categories
         case imageURL = "image_url"
+        case galleryImageURLs = "gallery_image_urls"
         case storeName = "store_name"
         case storeURL = "store_url"
         case createdAt = "created_at"
@@ -106,7 +108,7 @@ private struct GiftReadDTO: Decodable {
             id: id,
             name: name,
             description: description,
-            price: Double(price),
+            price: price,
             imageURL: imageURL,
             storeName: storeName,
             storeURL: storeURL,

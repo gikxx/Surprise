@@ -40,11 +40,11 @@ final class GiftDataLoader {
                 let count = try context.count(for: request)
                 if count == 0 {
                     self.loadGiftsFromJSON(into: context)
-                } else {
-                    print("✅ Gifts already loaded, skipping...")
                 }
             } catch {
+                #if DEBUG
                 print("Failed to check gifts existence: \(error)")
+                #endif
             }
         }
     }
@@ -52,7 +52,9 @@ final class GiftDataLoader {
     private func loadGiftsFromJSON(into context: NSManagedObjectContext) {
         guard let url = Bundle.main.url(forResource: "gifts", withExtension: "json"),
               let data = try? Data(contentsOf: url) else {
+            #if DEBUG
             print("❌ Failed to load gifts.json")
+            #endif
             return
         }
         
@@ -92,10 +94,11 @@ final class GiftDataLoader {
             }
             
             try context.save()
-            print("✅ Successfully loaded \(jsonData.gifts.count) gifts and \(jsonData.categories.count) categories")
             
         } catch {
+            #if DEBUG
             print("❌ Failed to parse or save gifts: \(error)")
+            #endif
         }
     }
 }

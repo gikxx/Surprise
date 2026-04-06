@@ -39,8 +39,8 @@ final class OnboardingContainerViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .appBackground
         setupPages()
-        setupPageViewController()
         setupUI()
+        setupPageViewController()
         updateInterface(for: 0)
     }
     
@@ -124,7 +124,8 @@ final class OnboardingContainerViewController: UIViewController {
             pageViewController.view.topAnchor.constraint(equalTo: view.topAnchor),
             pageViewController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             pageViewController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            pageViewController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            // Reserve space for controls to prevent onboarding text/buttons overlap.
+            pageViewController.view.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: -84)
         ])
     }
     

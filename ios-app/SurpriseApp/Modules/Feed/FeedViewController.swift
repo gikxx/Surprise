@@ -87,6 +87,7 @@ final class FeedViewController: UIViewController {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.contentInsetAdjustmentBehavior = .always
         collectionView.register(GiftCell.self, forCellWithReuseIdentifier: GiftCell.identifier)
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -131,9 +132,15 @@ final class FeedViewController: UIViewController {
 
         let sectionInset: CGFloat = 16
         let interItemSpacing: CGFloat = 16
+        let isRegularWidth = traitCollection.horizontalSizeClass == .regular
+        let columns: CGFloat = isRegularWidth ? 3 : 2
 
-        let totalHorizontalSpacing = sectionInset * 2 + interItemSpacing
-        let itemWidth = (view.bounds.width - totalHorizontalSpacing) / 2
+        let usableWidth = min(view.bounds.width, isRegularWidth ? 980 : view.bounds.width)
+        let horizontalPadding = max((view.bounds.width - usableWidth) / 2, sectionInset)
+        layout.sectionInset = UIEdgeInsets(top: 16, left: horizontalPadding, bottom: 16, right: horizontalPadding)
+
+        let totalHorizontalSpacing = horizontalPadding * 2 + interItemSpacing * (columns - 1)
+        let itemWidth = (view.bounds.width - totalHorizontalSpacing) / columns
         let itemHeight = itemWidth * 1.25
 
         let newSize = CGSize(width: itemWidth, height: itemHeight)
@@ -141,6 +148,12 @@ final class FeedViewController: UIViewController {
         if layout.itemSize != newSize {
             layout.itemSize = newSize
             layout.invalidateLayout()
+        }
+        
+        let bottomInset: CGFloat = 110
+        if collectionView.contentInset.bottom != bottomInset {
+            collectionView.contentInset.bottom = bottomInset
+            collectionView.verticalScrollIndicatorInsets.bottom = bottomInset
         }
     }
     
