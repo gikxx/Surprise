@@ -24,3 +24,4 @@ backend/.idea/
 __pycache__/
 *.pyc
 backend/.env
+.idea/
