@@ -7,6 +7,7 @@ protocol FavoritesServiceProtocol {
     func isFavorite(id: Int) -> Bool
     func getFavoriteIds() -> Set<Int>
     func syncFromServer() async throws
+    func fetchFavoriteGifts() async throws -> [Gift]
 }
 
 // MARK: - FavoritesService
@@ -72,6 +73,15 @@ final class FavoritesService: FavoritesServiceProtocol {
         } catch {
             throw error
         }
+    }
+    
+    func fetchFavoriteGifts() async throws -> [Gift] {
+        guard let token = authManager.token, !token.isEmpty else {
+            return []
+        }
+        let endpoint = Endpoint(path: "/favorites", method: .get)
+        let dtos: [GiftReadDTO] = try await networkService.request(endpoint)
+        return dtos.map { $0.toDomain() }
     }
 
     func isFavorite(id: Int) -> Bool {

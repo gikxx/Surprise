@@ -69,7 +69,7 @@ final class GiftCardView: UIView {
     
     func configure(with gift: Gift) {
         nameLabel.text = gift.name
-        priceLabel.text = "\(Int(gift.price))"
+        priceLabel.text = "\(Int(gift.price))₽"
         favoriteButton.tintColor = gift.isFavorite ? .appFavActive : .appBackground
         
         // Сбрасываем предыдущее состояние

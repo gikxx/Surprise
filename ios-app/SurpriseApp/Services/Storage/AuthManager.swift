@@ -7,7 +7,10 @@ final class AuthManager {
     private let tokenKey = "auth_token"
     private let userIdKey = "auth_user_id"
     private let userNameKey = "auth_user_name"
+    private let userEmailKey = "auth_user_email"
+    private let userPhoneKey = "auth_user_phone"
     private let isGuestKey = "auth_is_guest"
+    private let userAvatarKey = "auth_user_avatar"
     
     /// Токен авторизации текущего пользователя.
     var token: String? {
@@ -34,6 +37,21 @@ final class AuthManager {
         get { UserDefaults.standard.string(forKey: userNameKey) }
         set { UserDefaults.standard.set(newValue, forKey: userNameKey) }
     }
+    
+    var userEmail: String? {
+        get { UserDefaults.standard.string(forKey: userEmailKey) }
+        set { UserDefaults.standard.set(newValue, forKey: userEmailKey) }
+    }
+    
+    var userPhone: String? {
+        get { UserDefaults.standard.string(forKey: userPhoneKey) }
+        set { UserDefaults.standard.set(newValue, forKey: userPhoneKey) }
+    }
+    
+    var userAvatarUrl: String? {
+        get { UserDefaults.standard.string(forKey: userAvatarKey) }
+        set { UserDefaults.standard.set(newValue, forKey: userAvatarKey) }
+    }
 
     /// Флаг гостевого режима (пользователь пропустил регистрацию).
     var isGuest: Bool {
@@ -49,13 +67,26 @@ final class AuthManager {
         self.token = token
         self.userId = user.id
         self.userName = user.name
+        self.userEmail = user.email
+        self.userPhone = user.phone
+        self.userAvatarUrl = user.avatarUrl
         self.isGuest = isGuest
+    }
+    
+    func updateUserInfo(_ user: User) {
+        self.userName = user.name
+        self.userEmail = user.email
+        self.userPhone = user.phone
+        self.userAvatarUrl = user.avatarUrl
     }
     
     func setGuestSession() {
         token = nil
         userId = nil
         userName = nil
+        userEmail = nil
+        userPhone = nil
+        userAvatarUrl = nil
         isGuest = true
     }
     
@@ -63,6 +94,9 @@ final class AuthManager {
         token = nil
         userId = nil
         userName = nil
+        userEmail = nil
+        userPhone = nil
+        userAvatarUrl = nil
         isGuest = false
     }
 }

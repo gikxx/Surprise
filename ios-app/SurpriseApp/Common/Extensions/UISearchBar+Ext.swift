@@ -4,8 +4,8 @@ extension UISearchBar {
 
     func applyCustomStyle(
         backgroundColor: UIColor = .appSecondary,
-        textColor: UIColor = .appBackground,
-        placeholderColor: UIColor = .appWhite,
+        textColor: UIColor = .appPrimary,
+        placeholderColor: UIColor = .appBackground,
         placeholderText: String? = nil,
         iconColor: UIColor = .appPrimary,
         cornerRadius: CGFloat = 12
@@ -18,6 +18,7 @@ extension UISearchBar {
         textField.textColor = textColor
         textField.layer.cornerRadius = cornerRadius
         textField.layer.masksToBounds = true
+        textField.autocapitalizationType = .none
 
         if let placeholderText = placeholderText ?? self.placeholder {
             textField.attributedPlaceholder = NSAttributedString(

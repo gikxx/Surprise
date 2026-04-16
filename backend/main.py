@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import auth, gifts, favorites
+from routers import auth, gifts, favorites, users
 
 
 def create_app() -> FastAPI:

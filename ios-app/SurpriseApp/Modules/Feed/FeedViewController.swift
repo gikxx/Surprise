@@ -69,7 +69,7 @@ final class FeedViewController: UIViewController {
         
         searchBar.applyCustomStyle(
             backgroundColor: .appWhite,
-            textColor: .appBackground,
+            textColor: .appPrimary,
             placeholderColor: .appBackground,
             placeholderText: "что я хочу...",
             iconColor: .appBackground

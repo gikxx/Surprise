@@ -77,10 +77,9 @@ final class MainCoordinator: Coordinator {
     
     private func createProfileFlow() -> UINavigationController {
         let nav = UINavigationController()
-        let vc = ProfileViewController() // TODO: Щас заглушка
-        nav.viewControllers = [vc]
-        
-        
+        let coordinator = ProfileCoordinator(navigationController: nav)
+        childCoordinators.append(coordinator)
+        coordinator.start()
         return nav
     }
     

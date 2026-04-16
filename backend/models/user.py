@@ -17,6 +17,7 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     is_guest: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    avatar_url: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
 
     favorites: Mapped[List["Gift"]] = relationship(
         "Gift",

@@ -18,6 +18,7 @@ class UserRead(UserBase):
     id: int
     is_guest: bool = False
     created_at: datetime
+    avatar_url: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -36,3 +37,8 @@ class LoginRequest(BaseModel):
 class TokenData(BaseModel):
     user_id: int
 
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
+    avatar_url: Optional[str] = None

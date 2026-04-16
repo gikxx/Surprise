@@ -41,25 +41,24 @@ final class AuthService: AuthServiceProtocol {
         name: String,
         password: String
     ) async throws -> AuthResponse {
-        guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            throw AuthError.validationFailed("Имя не может быть пустым")
-        }
-        guard password.count >= 6 else {
-            throw AuthError.validationFailed("Пароль должен быть не короче 6 символов")
-        }
+        try ValidationService.shared.validateName(name)
+        try ValidationService.shared.validatePassword(password)
+        try ValidationService.shared.validateEmailOrPhone(emailOrPhone)
         
-        guard isValidEmailOrPhone(emailOrPhone) else {
-            throw AuthError.validationFailed("Введите корректный email или номер телефона")
+        var body: [String: Any] = [
+            "name": name,
+            "password": password
+        ]
+        if emailOrPhone.contains("@") {
+            body["email"] = emailOrPhone
+        } else {
+            body["phone"] = emailOrPhone
         }
-        
+
         let endpoint = Endpoint(
             path: "/auth/register",
             method: .post,
-            bodyParameters: [
-                "email_or_phone": emailOrPhone,
-                "name": name,
-                "password": password
-            ]
+            bodyParameters: body
         )
         
         do {
@@ -77,15 +76,8 @@ final class AuthService: AuthServiceProtocol {
         emailOrPhone: String,
         password: String
     ) async throws -> AuthResponse {
-        guard !emailOrPhone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            throw AuthError.validationFailed("Введите почту или номер телефона")
-        }
-        guard password.count >= 6 else {
-            throw AuthError.validationFailed("Пароль должен быть не короче 6 символов")
-        }
-        guard isValidEmailOrPhone(emailOrPhone) else {
-            throw AuthError.validationFailed("Введите корректный email или номер телефона")
-        }
+        try ValidationService.shared.validateEmailOrPhone(emailOrPhone)
+        try ValidationService.shared.validatePassword(password)
         
         let endpoint = Endpoint(
             path: "/auth/login",
@@ -183,4 +175,5 @@ final class MockAuthService: AuthServiceProtocol {
         return guest
     }
 }
+
 

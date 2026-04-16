@@ -29,34 +29,16 @@ final class FavoritesViewModel: FavoritesViewModelProtocol {
     
     func loadFavorites() {
         Task {
-            if !AuthManager.shared.isGuest {
-                do {
-                    try await favoritesService.syncFromServer()
-                } catch {
-                    #if DEBUG
-                    print("❌ Failed to sync favorites: \(error)")
-                    #endif
-                }
-            }
-            
             do {
-                let allGifts = try await repository.getAllGifts()
-                let favoriteIds = favoritesService.getFavoriteIds()
-                let favorites = allGifts.filter { favoriteIds.contains($0.id) }
-                    .map { gift -> Gift in
-                        var copy = gift
-                        copy.isFavorite = true
-                        return copy
-                    }
-                
+                let favoriteGifts = try await favoritesService.fetchFavoriteGifts()
                 await MainActor.run {
-                    self.items = favorites
-                    self.isEmpty = favorites.isEmpty
+                    self.items = favoriteGifts
+                    self.isEmpty = favoriteGifts.isEmpty
                     self.onStateChanged?()
                 }
             } catch {
                 #if DEBUG
-                print("❌ Failed to load favorites: \(error)")
+                print("❌ Failed to load favorite gifts: \(error)")
                 #endif
             }
         }

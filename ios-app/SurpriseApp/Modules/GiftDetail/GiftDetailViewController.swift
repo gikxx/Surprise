@@ -31,9 +31,6 @@ final class GiftDetailViewController: UIViewController {
     
     private let backButton = UIButton(type: .system)
     private var topCardHeightConstraint: NSLayoutConstraint?
-    #if DEBUG
-    private var lastLoggedViewportSize: CGSize = .zero
-    #endif
     
     private let tapBarHeight: CGFloat = 60
     private let bottomPadding: CGFloat = 30
@@ -205,15 +202,6 @@ final class GiftDetailViewController: UIViewController {
         if !isPadDevice {
             let isCompactCompatibilityViewport = viewportRatio <= 1.9
             topCardHeightConstraint.constant = width * (isCompactCompatibilityViewport ? 0.9 : 1.15)
-            #if DEBUG
-            logTopCardMetricsIfNeeded(
-                width: width,
-                height: height,
-                isPadDevice: isPadDevice,
-                resolvedHeight: topCardHeightConstraint.constant,
-                branch: "phone"
-            )
-            #endif
             return
         }
         
@@ -223,41 +211,7 @@ final class GiftDetailViewController: UIViewController {
         let resolvedHeight = min(widthBasedHeight, heightCap)
         
         topCardHeightConstraint.constant = min(max(resolvedHeight, 240), 360)
-        #if DEBUG
-        logTopCardMetricsIfNeeded(
-            width: width,
-            height: height,
-            isPadDevice: isPadDevice,
-            resolvedHeight: topCardHeightConstraint.constant,
-            branch: "pad"
-        )
-        #endif
     }
-    
-    #if DEBUG
-    private func logTopCardMetricsIfNeeded(
-        width: CGFloat,
-        height: CGFloat,
-        isPadDevice: Bool,
-        resolvedHeight: CGFloat,
-        branch: String
-    ) {
-        let currentSize = CGSize(width: round(width), height: round(height))
-        guard currentSize != lastLoggedViewportSize else { return }
-        lastLoggedViewportSize = currentSize
-        
-        let hClass = traitCollection.horizontalSizeClass == .compact ? "c" : "r"
-        let vClass = traitCollection.verticalSizeClass == .compact ? "c" : "r"
-        let ratio = height / width
-        
-        print(
-            "[GiftDetailCard] branch=\(branch) isPad=\(isPadDevice) " +
-            "idiom=\(UIDevice.current.userInterfaceIdiom == .pad ? "pad" : "phone") " +
-            "sizeClass=\(hClass)/\(vClass) viewport=\(Int(width))x\(Int(height)) " +
-            "ratio=\(String(format: "%.3f", ratio)) cardHeight=\(Int(resolvedHeight))"
-        )
-    }
-    #endif
     
     private func setupDescription() {
         nameLabel.font = .helveticaBold(size: 23)
@@ -374,7 +328,7 @@ final class GiftDetailViewController: UIViewController {
     // MARK: - Configure
     private func configure(with gift: Gift) {
         nameLabel.text = gift.name
-        priceLabel.text = "\(Int(gift.price))"
+        priceLabel.text = "\(Int(gift.price))₽"
         fullDescriptionText = gift.description ?? ""
         isDescriptionExpanded = false
         updateDescriptionState(animated: false)

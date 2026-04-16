@@ -3,6 +3,7 @@ import UIKit
 final class RegistrationViewController: UIViewController {
     var onContinue: (() -> Void)?
     var onSkip: (() -> Void)?
+    var onBack: (() -> Void)?
 
     private let viewModel: AuthViewModelProtocol
 
@@ -14,6 +15,15 @@ final class RegistrationViewController: UIViewController {
         label.textAlignment = .center
         return label
     }()
+    
+    // TODO: - вынести куда-то эту кнопку, а то везде повторяется
+    private let backButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "back_icon"), for: .normal)
+        button.tintColor = .appSecondary
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
 
     // Поля с заголовками (контейнеры с UILabel + UITextField внутри)
     private let phoneEmailField = UITextField.createWithLabel(title: "почта/номер телефона")
@@ -22,10 +32,12 @@ final class RegistrationViewController: UIViewController {
 
     private let continueButton = UIButton.createPrimary(title: "продолжить")
     private let skipButton = UIButton.createPrimary(title: "пропустить")
+    private let shouldShowBackButton: Bool
 
     // MARK: - Init
-    init(viewModel: AuthViewModelProtocol) {
+    init(viewModel: AuthViewModelProtocol, shouldShowBackButton: Bool = false) {
         self.viewModel = viewModel
+        self.shouldShowBackButton = shouldShowBackButton
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -39,6 +51,9 @@ final class RegistrationViewController: UIViewController {
         view.backgroundColor = .appBackground
         setupUI()
         setupKeyboardHandling()
+        if shouldShowBackButton {
+            setupBackButton()
+        }
     }
 
     private func setupUI() {
@@ -94,6 +109,20 @@ final class RegistrationViewController: UIViewController {
             container.subviews.first(where: { $0 is UITextField }) as? UITextField
         }
     }
+    
+    private func setupBackButton() {
+        view.addSubview(backButton)
+        view.bringSubviewToFront(backButton)
+        NSLayoutConstraint.activate([
+            backButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
+            backButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            backButton.widthAnchor.constraint(equalToConstant: 40),
+            backButton.heightAnchor.constraint(equalToConstant: 40)
+        ])
+        backButton.addTarget(self, action: #selector(didTapBack), for: .touchUpInside)
+    }
+        
+        
 
     // MARK: - Actions
     
@@ -125,6 +154,10 @@ final class RegistrationViewController: UIViewController {
     
     @objc private func didTapSkip() {
         onSkip?()
+    }
+    
+    @objc private func didTapBack() {
+        onBack?()
     }
     
     @objc private func dismissKeyboard() {
