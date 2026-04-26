@@ -27,11 +27,21 @@ class UserRead(UserBase):
 class AuthResponse(BaseModel):
     user: UserRead
     token: str
+    refresh_token: str
 
 
 class LoginRequest(BaseModel):
     email_or_phone: str
     password: str
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
+
+
+class RefreshTokenResponse(BaseModel):
+    token: str
+    refresh_token: str
 
 
 class TokenData(BaseModel):

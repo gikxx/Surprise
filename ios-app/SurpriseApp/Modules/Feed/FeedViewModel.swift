@@ -90,6 +90,7 @@ final class FeedViewModel: FeedViewModelProtocol {
                     self.canLoadMore = false
                 }
             } catch {
+                AnalyticsService.shared.logCriticalError(scenario: "load_initial", error: error)
                 await MainActor.run {
                     updateGiftsState([], isLoading: false, error: "Не удалось загрузить подарки")
                     self.canLoadMore = false
@@ -177,6 +178,7 @@ final class FeedViewModel: FeedViewModelProtocol {
                     updateGiftsState(results)
                 }
             } catch {
+                AnalyticsService.shared.logCriticalError(scenario: "filter_by_category", error: error, parameters: ["category": category])
                 await MainActor.run {
                     let localResults = allGifts.filter { $0.categories.contains(category) }
                     updateGiftsState(localResults)

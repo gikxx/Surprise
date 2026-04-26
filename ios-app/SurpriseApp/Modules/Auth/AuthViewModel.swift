@@ -12,6 +12,12 @@ protocol AuthViewModelProtocol: AnyObject {
         completion: @escaping (Result<User, AuthError>) -> Void
     )
     
+    func login(
+        emailOrPhone: String,
+        password: String,
+        completion: @escaping (Result<User, AuthError>) -> Void
+    )
+    
     func startGuest(
         completion: @escaping (User) -> Void
     )
@@ -86,6 +92,49 @@ final class AuthViewModel: AuthViewModelProtocol {
             let guest = await authService.startGuestSession()
             await MainActor.run {
                 completion(guest)
+            }
+        }
+    }
+    
+    func login(
+        emailOrPhone: String,
+        password: String,
+        completion: @escaping (Result<User, AuthError>) -> Void
+    ) {
+        isLoading = true
+        errorMessage = nil
+        
+        Task {
+            do {
+                let response = try await authService.login(
+                    emailOrPhone: emailOrPhone,
+                    password: password
+                )
+                await MainActor.run {
+                    self.isLoading = false
+                    self.errorMessage = nil
+                    completion(.success(response.user))
+                }
+            } catch let error as AuthError {
+                await MainActor.run {
+                    self.isLoading = false
+                    self.errorMessage = Self.message(for: error)
+                    completion(.failure(error))
+                }
+            } catch let error as NetworkError {
+                let authError: AuthError = .network(error)
+                await MainActor.run {
+                    self.isLoading = false
+                    self.errorMessage = Self.message(for: authError)
+                    completion(.failure(authError))
+                }
+            } catch {
+                await MainActor.run {
+                    self.isLoading = false
+                    let authError: AuthError = .unknown
+                    self.errorMessage = Self.message(for: authError)
+                    completion(.failure(authError))
+                }
             }
         }
     }

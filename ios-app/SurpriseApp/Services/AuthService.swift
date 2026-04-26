@@ -63,15 +63,22 @@ final class AuthService: AuthServiceProtocol {
         
         do {
             let response: AuthResponse = try await networkService.request(endpoint)
-            AuthManager.shared.setSession(user: response.user, token: response.token, isGuest: false)
+            AuthManager.shared.setSession(
+                user: response.user,
+                token: response.token,
+                refreshToken: response.refreshToken,
+                isGuest: false
+            )
             return response
         } catch let error as NetworkError {
+            AnalyticsService.shared.logCriticalError(scenario: "registration", error: error)
             throw AuthError.network(error)
         } catch {
+            AnalyticsService.shared.logCriticalError(scenario: "registration", error: error)
             throw AuthError.unknown
         }
     }
-    
+
     func login(
         emailOrPhone: String,
         password: String
@@ -90,11 +97,18 @@ final class AuthService: AuthServiceProtocol {
         
         do {
             let response: AuthResponse = try await networkService.request(endpoint)
-            AuthManager.shared.setSession(user: response.user, token: response.token, isGuest: false)
+            AuthManager.shared.setSession(
+                user: response.user,
+                token: response.token,
+                refreshToken: response.refreshToken,
+                isGuest: false
+            )
             return response
         } catch let error as NetworkError {
+            AnalyticsService.shared.logCriticalError(scenario: "login", error: error)
             throw AuthError.network(error)
         } catch {
+            AnalyticsService.shared.logCriticalError(scenario: "login", error: error)
             throw AuthError.invalidCredentials
         }
     }
@@ -140,8 +154,13 @@ final class MockAuthService: AuthServiceProtocol {
             isGuest: false
         )
         let token = UUID().uuidString
-        let response = AuthResponse(user: user, token: token)
-        AuthManager.shared.setSession(user: user, token: token, isGuest: false)
+        let response = AuthResponse(user: user, token: token, refreshToken: "mock-refresh-\(UUID().uuidString)")
+        AuthManager.shared.setSession(
+            user: user,
+            token: token,
+            refreshToken: response.refreshToken,
+            isGuest: false
+        )
         return response
     }
     
@@ -158,8 +177,13 @@ final class MockAuthService: AuthServiceProtocol {
             isGuest: false
         )
         let token = "mock-token-\(UUID().uuidString)"
-        let response = AuthResponse(user: user, token: token)
-        AuthManager.shared.setSession(user: user, token: token, isGuest: false)
+        let response = AuthResponse(user: user, token: token, refreshToken: "mock-refresh-\(UUID().uuidString)")
+        AuthManager.shared.setSession(
+            user: user,
+            token: token,
+            refreshToken: response.refreshToken,
+            isGuest: false
+        )
         return response
     }
     

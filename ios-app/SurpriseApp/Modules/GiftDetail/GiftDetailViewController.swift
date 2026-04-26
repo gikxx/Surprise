@@ -445,7 +445,8 @@ final class GiftDetailViewController: UIViewController {
     }
     
     @objc private func didTapBuy() {
-        onBuyTapped?() 
+        AnalyticsService.shared.logBuyClick(giftId: viewModel.gift.id)
+        onBuyTapped?()
     }
     
     @objc private func didTapBack() {

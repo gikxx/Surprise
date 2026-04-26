@@ -14,12 +14,24 @@ final class AppCoordinator: Coordinator {
     var navigationController: UINavigationController
     
     private let window: UIWindow
+    private var isShowingAuthFlow = false
     
     // MARK: - Init
     // Dependency Injection: передаем окно из SceneDelegate.
     init(window: UIWindow) {
         self.window = window
         self.navigationController = UINavigationController()
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleSessionExpired),
+            name: .authSessionExpired,
+            object: nil
+        )
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: - Public Methods
@@ -33,16 +45,26 @@ final class AppCoordinator: Coordinator {
             return
         }
         
-        showAuthFlow()
+        showAuthFlow(showOnboardingOnFinish: true)
     }
     
     // MARK: - Private Methods
-    private func showAuthFlow() {
+    private func showAuthFlow(showOnboardingOnFinish: Bool) {
+        isShowingAuthFlow = true
+        childCoordinators.removeAll()
+        
         let authCoordinator = AuthCoordinator(navigationController: navigationController)
         
         authCoordinator.onFinish = { [weak self] in
-            self?.childCoordinators.removeAll()
-            self?.showOnboardingFlow()
+            guard let self = self else { return }
+            self.childCoordinators.removeAll()
+            self.isShowingAuthFlow = false
+            
+            if showOnboardingOnFinish {
+                self.showOnboardingFlow()
+            } else {
+                self.showMainFlow()
+            }
         }
         
         childCoordinators.append(authCoordinator)
@@ -50,6 +72,7 @@ final class AppCoordinator: Coordinator {
     }
     
     private func showOnboardingFlow() {
+        isShowingAuthFlow = false
         let onboardingCoordinator = OnboardingCoordinator(navigationController: navigationController)
         
         onboardingCoordinator.onFinish = { [weak self] in
@@ -62,8 +85,22 @@ final class AppCoordinator: Coordinator {
     }
     
     private func showMainFlow() {
+        isShowingAuthFlow = false
+        childCoordinators.removeAll()
+        
+        if !UserDefaults.standard.bool(forKey: "hasSentMainScreenAnalytics") {
+            AnalyticsService.shared.logMainScreen()
+            UserDefaults.standard.set(true, forKey: "hasSentMainScreenAnalytics")
+        }
+        
         let mainCoordinator = MainCoordinator(navigationController: navigationController)
         childCoordinators.append(mainCoordinator)
         mainCoordinator.start()
+    }
+    
+    @objc private func handleSessionExpired() {
+        guard !isShowingAuthFlow else { return }
+        AuthManager.shared.logout()
+        showAuthFlow(showOnboardingOnFinish: false)
     }
 }

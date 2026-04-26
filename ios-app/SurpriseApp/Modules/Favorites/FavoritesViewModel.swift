@@ -31,9 +31,19 @@ final class FavoritesViewModel: FavoritesViewModelProtocol {
         Task {
             do {
                 let favoriteGifts = try await favoritesService.fetchFavoriteGifts()
+                let resolvedFavorites: [Gift]
+                
+                if favoriteGifts.isEmpty {
+                    let allGifts = try await repository.getAllGifts()
+                    let localIds = favoritesService.getFavoriteIds()
+                    resolvedFavorites = allGifts.filter { localIds.contains($0.id) }
+                } else {
+                    resolvedFavorites = favoriteGifts
+                }
+                
                 await MainActor.run {
-                    self.items = favoriteGifts
-                    self.isEmpty = favoriteGifts.isEmpty
+                    self.items = resolvedFavorites
+                    self.isEmpty = resolvedFavorites.isEmpty
                     self.onStateChanged?()
                 }
             } catch {

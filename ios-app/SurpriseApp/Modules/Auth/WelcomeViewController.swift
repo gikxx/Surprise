@@ -2,6 +2,7 @@ import UIKit
 
 final class WelcomeViewController: UIViewController {
     var onRegister: (() -> Void)?
+    var onLogin: (() -> Void)?
     var onSkip: (() -> Void)?
 
     private let titleLabel: UILabel = {
@@ -23,16 +24,18 @@ final class WelcomeViewController: UIViewController {
     }()
 
     private let registerButton = UIButton.createPrimary(title: "регистрация")
+    private let loginButton = UIButton.createPrimary(title: "вход")
     private let skipButton = UIButton.createPrimary(title: "пропустить")
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        AnalyticsService.shared.logStartScreen()
         view.backgroundColor = .appBackground
         setupUI()
     }
 
     private func setupUI() {
-        [titleLabel, registerButton, skipButton, starImageView].forEach {
+        [titleLabel, registerButton, loginButton, skipButton, starImageView].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
@@ -46,11 +49,16 @@ final class WelcomeViewController: UIViewController {
             titleLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -50),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
-            registerButton.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 100),
+            loginButton.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 100),
+            loginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            loginButton.widthAnchor.constraint(equalToConstant: 216),
+            loginButton.heightAnchor.constraint(equalToConstant: 56),
+            
+            registerButton.topAnchor.constraint(equalTo: loginButton.bottomAnchor, constant: 16),
             registerButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             registerButton.widthAnchor.constraint(equalToConstant: 216),
             registerButton.heightAnchor.constraint(equalToConstant: 56),
-
+            
             skipButton.topAnchor.constraint(equalTo: registerButton.bottomAnchor, constant: 16),
             skipButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             skipButton.widthAnchor.constraint(equalToConstant: 216),
@@ -58,9 +66,11 @@ final class WelcomeViewController: UIViewController {
         ])
 
         registerButton.addTarget(self, action: #selector(didTapRegister), for: .touchUpInside)
+        loginButton.addTarget(self, action: #selector(didTapLogin), for: .touchUpInside)
         skipButton.addTarget(self, action: #selector(didTapSkip), for: .touchUpInside)
     }
 
     @objc private func didTapRegister() { onRegister?() }
+    @objc private func didTapLogin() { onLogin?() }
     @objc private func didTapSkip() { onSkip?() }
 }

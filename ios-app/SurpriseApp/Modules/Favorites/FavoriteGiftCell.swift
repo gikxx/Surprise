@@ -11,6 +11,7 @@ final class FavoriteGiftCell: UICollectionViewCell {
     }()
     
     private let buyButton = UIButton.createPrimary(title: "к продавцу")
+    private var currentGift: Gift?
     
     var onFavoriteTapped: (() -> Void)? {
         get { cardView.onFavoriteTapped }
@@ -47,10 +48,14 @@ final class FavoriteGiftCell: UICollectionViewCell {
     required init?(coder: NSCoder) { fatalError() }
     
     func configure(with gift: Gift) {
+        self.currentGift = gift
         cardView.configure(with: gift)
     }
     
     @objc private func didTapBuy() {
+        if let gift = currentGift {
+            AnalyticsService.shared.logBuyClick(giftId: gift.id)
+        }
         onBuyTapped?()
     }
 }

@@ -42,4 +42,26 @@ struct User: Decodable {
 struct AuthResponse: Decodable {
     let user: User
     let token: String
+    let refreshToken: String?
+    
+    init(user: User, token: String, refreshToken: String?) {
+        self.user = user
+        self.token = token
+        self.refreshToken = refreshToken
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case user
+        case token
+        case accessToken = "access_token"
+        case refreshToken = "refresh_token"
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        user = try container.decode(User.self, forKey: .user)
+        token = try container.decodeIfPresent(String.self, forKey: .token)
+            ?? container.decode(String.self, forKey: .accessToken)
+        refreshToken = try container.decodeIfPresent(String.self, forKey: .refreshToken)
+    }
 }

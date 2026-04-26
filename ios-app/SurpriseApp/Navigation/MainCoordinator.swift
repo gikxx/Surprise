@@ -46,6 +46,8 @@ final class MainCoordinator: Coordinator {
         navigationController.setNavigationBarHidden(true, animated: false)
         
         navigationController.pushViewController(tabBarController, animated: false)
+        
+        AnalyticsService.shared.logMainScreen()
     }
     
     // MARK: - Flow Creators

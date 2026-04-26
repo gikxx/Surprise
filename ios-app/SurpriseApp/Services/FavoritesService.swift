@@ -42,6 +42,7 @@ final class FavoritesService: FavoritesServiceProtocol {
                 self.save()
             }
         } catch {
+            AnalyticsService.shared.logCriticalError(scenario: "sync_favorites", error: error)
             throw error
         }
     }
@@ -50,8 +51,10 @@ final class FavoritesService: FavoritesServiceProtocol {
         guard let token = authManager.token, !token.isEmpty else {
             await MainActor.run {
                 if favoriteIds.contains(id) {
+                    AnalyticsService.shared.logRemoveFromFavorites(giftId: id)
                     favoriteIds.remove(id)
                 } else {
+                    AnalyticsService.shared.logAddToFavorites(giftId: id)
                     favoriteIds.insert(id)
                 }
                 save()
@@ -64,16 +67,19 @@ final class FavoritesService: FavoritesServiceProtocol {
             let _: EmptyResponse = try await networkService.request(endpoint)
             await MainActor.run {
                 if favoriteIds.contains(id) {
+                    AnalyticsService.shared.logRemoveFromFavorites(giftId: id)
                     favoriteIds.remove(id)
                 } else {
+                    AnalyticsService.shared.logAddToFavorites(giftId: id)
                     favoriteIds.insert(id)
                 }
                 save()
             }
         } catch {
+            AnalyticsService.shared.logCriticalError(scenario: "toggle_favorite", error: error, parameters: ["gift_id": id])
             throw error
         }
-    }
+    }   
     
     func fetchFavoriteGifts() async throws -> [Gift] {
         guard let token = authManager.token, !token.isEmpty else {

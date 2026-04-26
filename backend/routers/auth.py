@@ -1,11 +1,25 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from jose import JWTError
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session
 from models import User
-from schemas.user import AuthResponse, LoginRequest, UserCreate, UserRead
-from security import create_access_token, get_password_hash, verify_password
+from schemas.user import (
+    AuthResponse,
+    LoginRequest,
+    RefreshTokenRequest,
+    RefreshTokenResponse,
+    UserCreate,
+    UserRead,
+)
+from security import (
+    create_access_token,
+    create_refresh_token,
+    decode_token,
+    get_password_hash,
+    verify_password,
+)
 
 router = APIRouter()
 
@@ -48,10 +62,12 @@ async def register(
     await session.refresh(user)
 
     token = create_access_token({"sub": str(user.id)})
+    refresh_token = create_refresh_token({"sub": str(user.id)})
 
     return AuthResponse(
         user=UserRead.from_orm(user),
         token=token,
+        refresh_token=refresh_token,
     )
 
 
@@ -80,9 +96,62 @@ async def login(
         )
 
     token = create_access_token({"sub": str(user.id)})
+    refresh_token = create_refresh_token({"sub": str(user.id)})
 
     return AuthResponse(
         user=UserRead.from_orm(user),
         token=token,
+        refresh_token=refresh_token,
+    )
+
+
+@router.post("/refresh", response_model=RefreshTokenResponse)
+async def refresh_token(
+    payload: RefreshTokenRequest,
+    session: AsyncSession = Depends(get_session),
+) -> RefreshTokenResponse:
+    try:
+        token_payload = decode_token(payload.refresh_token)
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token",
+        )
+
+    if token_payload.get("type") != "refresh":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token type",
+        )
+
+    user_id_raw = token_payload.get("sub")
+    if user_id_raw is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token payload",
+        )
+
+    try:
+        user_id = int(user_id_raw)
+    except (TypeError, ValueError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token payload",
+        )
+
+    result = await session.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+        )
+
+    new_access_token = create_access_token({"sub": str(user.id)})
+    new_refresh_token = create_refresh_token({"sub": str(user.id)})
+
+    return RefreshTokenResponse(
+        token=new_access_token,
+        refresh_token=new_refresh_token,
     )
 

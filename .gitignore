@@ -25,3 +25,11 @@ __pycache__/
 *.pyc
 backend/.env
 .idea/
+
+# CocoaPods
+ios-app/Pods/
+ios-app/Podfile.lock
+ios-app/*.xcworkspace
+ios-app/SurpriseApp.xcworkspace/
+ios-app/SurpriseApp.xcodeproj/xcuserdata/
+ios-app/SurpriseApp.xcodeproj/xcuserdata/

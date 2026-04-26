@@ -26,13 +26,39 @@ def get_password_hash(password: str) -> str:
 
 
 def create_access_token(data: dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+    return _create_token(
+        data=data,
+        expires_delta=expires_delta,
+        token_type="access",
+    )
+
+
+def create_refresh_token(data: dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+    settings = get_settings()
+    return _create_token(
+        data=data,
+        expires_delta=expires_delta or timedelta(days=settings.refresh_token_expire_days),
+        token_type="refresh",
+    )
+
+
+def decode_token(token: str) -> dict[str, Any]:
+    settings = get_settings()
+    return jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
+
+
+def _create_token(
+    data: dict[str, Any],
+    expires_delta: Optional[timedelta],
+    token_type: str,
+) -> str:
     settings = get_settings()
     to_encode = data.copy()
     expire = datetime.utcnow() + (
         expires_delta or timedelta(minutes=settings.access_token_expire_minutes)
     )
-    print(f"🔧 Creating token with expire: {expire.isoformat()}, now: {datetime.utcnow().isoformat()}")
     to_encode.update({"exp": expire})
+    to_encode.update({"type": token_type})
     encoded_jwt = jwt.encode(
         to_encode,
         settings.jwt_secret_key,
@@ -45,22 +71,23 @@ async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(oauth2_scheme),
     session: AsyncSession = Depends(get_session),
 ) -> User:
-    settings = get_settings()
     token = credentials.credentials
-    print(f"🔧 Current server time (UTC): {datetime.utcnow().isoformat()}")
-    print(f"🔍 Received token: {token[:30]}...")
     try:
-        payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
-        user_id: int | None = payload.get("sub")
+        payload = decode_token(token)
+        if payload.get("type") != "access":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token type",
+            )
+        user_id_raw = payload.get("sub")
+        user_id: int | None = int(user_id_raw) if user_id_raw is not None else None
         if user_id is None:
-            print("❌ Invalid token payload: missing sub")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token payload",
             )
         token_data = TokenData(user_id=user_id)
-    except JWTError as e:
-        print(f"❌ JWT decode error: {e}")
+    except (JWTError, ValueError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",

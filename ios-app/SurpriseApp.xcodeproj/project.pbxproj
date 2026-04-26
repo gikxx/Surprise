@@ -6,7 +6,14 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		900A97ABFED705E9E2FAD711 /* Pods_SurpriseApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E37B3F02CD9296E2CE7C908 /* Pods_SurpriseApp.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		10BA8398D3D3B9784BEE305A /* Pods-SurpriseApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SurpriseApp.debug.xcconfig"; path = "Target Support Files/Pods-SurpriseApp/Pods-SurpriseApp.debug.xcconfig"; sourceTree = "<group>"; };
+		190166763F5BBBF3C843CB97 /* Pods-SurpriseApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SurpriseApp.release.xcconfig"; path = "Target Support Files/Pods-SurpriseApp/Pods-SurpriseApp.release.xcconfig"; sourceTree = "<group>"; };
+		5E37B3F02CD9296E2CE7C908 /* Pods_SurpriseApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SurpriseApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D51D0B762F214C4400F7D69E /* SurpriseApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SurpriseApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -36,17 +43,30 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				900A97ABFED705E9E2FAD711 /* Pods_SurpriseApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3311FAE387A851231762F49B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				10BA8398D3D3B9784BEE305A /* Pods-SurpriseApp.debug.xcconfig */,
+				190166763F5BBBF3C843CB97 /* Pods-SurpriseApp.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		D51D0B6D2F214C4400F7D69E = {
 			isa = PBXGroup;
 			children = (
 				D51D0B782F214C4400F7D69E /* SurpriseApp */,
 				D51D0B772F214C4400F7D69E /* Products */,
+				3311FAE387A851231762F49B /* Pods */,
+				F047A0EEC9FAB45B298D635E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -58,6 +78,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		F047A0EEC9FAB45B298D635E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5E37B3F02CD9296E2CE7C908 /* Pods_SurpriseApp.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -65,6 +93,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D51D0B892F214C4600F7D69E /* Build configuration list for PBXNativeTarget "SurpriseApp" */;
 			buildPhases = (
+				F59F1F0A4C7988DD3088D742 /* [CP] Check Pods Manifest.lock */,
 				D51D0B722F214C4400F7D69E /* Sources */,
 				D51D0B732F214C4400F7D69E /* Frameworks */,
 				D51D0B742F214C4400F7D69E /* Resources */,
@@ -77,8 +106,6 @@
 				D51D0B782F214C4400F7D69E /* SurpriseApp */,
 			);
 			name = SurpriseApp;
-			packageProductDependencies = (
-			);
 			productName = surprise;
 			productReference = D51D0B762F214C4400F7D69E /* SurpriseApp.app */;
 			productType = "com.apple.product-type.application";
@@ -127,6 +154,31 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		F59F1F0A4C7988DD3088D742 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SurpriseApp-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		D51D0B722F214C4400F7D69E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -140,11 +192,12 @@
 /* Begin XCBuildConfiguration section */
 		D51D0B8A2F214C4600F7D69E /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 10BA8398D3D3B9784BEE305A /* Pods-SurpriseApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = 8XRN4B69W4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SurpriseApp/Application/Info.plist;
@@ -178,11 +231,12 @@
 		};
 		D51D0B8B2F214C4600F7D69E /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 190166763F5BBBF3C843CB97 /* Pods-SurpriseApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = 8XRN4B69W4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SurpriseApp/Application/Info.plist;
@@ -248,11 +302,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 6B6VK78D5Q;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -316,7 +370,7 @@
 				DEVELOPMENT_TEAM = 6B6VK78D5Q;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
