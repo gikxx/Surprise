@@ -1,19 +1,21 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from db import get_session
-from models import User
-from schemas.user import UserRead, UserUpdate
-from security import get_current_user
+from app.core.db import get_session
+from app.core.security import get_current_user
+from app.models import User
+from app.schemas.user import UserRead, UserUpdate
 
 router = APIRouter()
+
 
 @router.get("/me", response_model=UserRead)
 async def get_current_user_profile(
     current_user: User = Depends(get_current_user),
 ):
     return UserRead.model_validate(current_user, from_attributes=True)
+
 
 @router.put("/me", response_model=UserRead)
 async def update_current_user_profile(

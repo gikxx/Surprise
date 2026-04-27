@@ -6,7 +6,7 @@ final class GiftRemoteDataSource: GiftRemoteDataSourceProtocol {
     init(networkService: NetworkServiceProtocol = NetworkService()) {
         self.networkService = networkService
     }
-    
+
     func fetchAll(page: Int, perPage: Int) async throws -> [Gift] {
         let endpoint = Endpoint(
             path: "/gifts",
@@ -47,12 +47,12 @@ final class GiftRemoteDataSource: GiftRemoteDataSourceProtocol {
         return response.gifts.map { $0.toDomain() }
     }
 
-    func fetchByCategory(_ category: String, page: Int, perPage: Int) async throws -> [Gift] {
+    func fetchByCategory(id: Int, page: Int, perPage: Int) async throws -> [Gift] {
         let endpoint = Endpoint(
             path: "/gifts",
             method: .get,
             queryItems: [
-                URLQueryItem(name: "category", value: category),
+                URLQueryItem(name: "category_id", value: String(id)),
                 URLQueryItem(name: "page", value: String(page)),
                 URLQueryItem(name: "per_page", value: String(perPage))
             ]
@@ -61,9 +61,12 @@ final class GiftRemoteDataSource: GiftRemoteDataSourceProtocol {
         return response.gifts.map { $0.toDomain() }
     }
 
-    func fetchCategories() async throws -> [String] {
-        let gifts = try await fetchAll(page: 1, perPage: 500)
-        let categories = Set(gifts.flatMap(\.categories))
-        return categories.sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+    func fetchCategories() async throws -> [Category] {
+        // Раньше вытягивали все подарки и собирали Set уникальных строк —
+        // теперь у бэка есть отдельный endpoint, и категории приходят
+        // объектами {id, name}.
+        let endpoint = Endpoint(path: "/categories", method: .get)
+        let dtos: [CategoryReadDTO] = try await networkService.request(endpoint)
+        return dtos.map { $0.toDomain() }
     }
 }

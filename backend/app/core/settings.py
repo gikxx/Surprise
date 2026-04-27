@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     """
 
     database_url: AnyUrl = (
-        "postgresql+asyncpg://postgres:postgres@localhost:5432/surprise"  
+        "postgresql+asyncpg://postgres:postgres@localhost:5432/surprise"
     )
 
     jwt_secret_key: str = "dev_secret_key"
@@ -35,4 +35,3 @@ def get_settings() -> Settings:
     """
 
     return Settings()
-

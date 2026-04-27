@@ -50,6 +50,7 @@ final class GiftDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .appBackground
+        navigationItem.hidesBackButton = true
         setupUI()
         configure(with: viewModel.gift)
         setupBindings()

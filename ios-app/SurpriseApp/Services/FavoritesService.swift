@@ -1,5 +1,5 @@
 import Foundation
-import CoreData 
+import CoreData
 
 // MARK: - FavoritesServiceProtocol
 protocol FavoritesServiceProtocol {
@@ -35,7 +35,8 @@ final class FavoritesService: FavoritesServiceProtocol {
 
         let endpoint = Endpoint(path: "/favorites", method: .get)
         do {
-            let response: [FavoriteDTO] = try await networkService.request(endpoint)
+            // Бэк отдаёт массив GiftRead, нам нужен только список id.
+            let response: [GiftReadDTO] = try await networkService.request(endpoint)
             let serverIds = Set(response.map { $0.id })
             await MainActor.run {
                 self.favoriteIds = serverIds
@@ -49,6 +50,7 @@ final class FavoritesService: FavoritesServiceProtocol {
 
     func toggleFavorite(id: Int) async throws {
         guard let token = authManager.token, !token.isEmpty else {
+            // Гостевой режим: переключаем только локально.
             await MainActor.run {
                 if favoriteIds.contains(id) {
                     AnalyticsService.shared.logRemoveFromFavorites(giftId: id)
@@ -61,26 +63,34 @@ final class FavoritesService: FavoritesServiceProtocol {
             }
             return
         }
-        
+
         let endpoint = Endpoint(path: "/favorites/\(id)/toggle", method: .post)
         do {
-            let _: EmptyResponse = try await networkService.request(endpoint)
+            // Сервер возвращает обновлённый GiftRead с актуальным is_favorite.
+            // Раньше мы угадывали новое состояние по содержимому локального
+            // кэша, что приводило к инверсии при рассинхроне с сервером.
+            // Теперь источник истины — поле is_favorite в ответе.
+            let response: GiftReadDTO = try await networkService.request(endpoint)
             await MainActor.run {
-                if favoriteIds.contains(id) {
-                    AnalyticsService.shared.logRemoveFromFavorites(giftId: id)
-                    favoriteIds.remove(id)
-                } else {
+                if response.isFavorite {
                     AnalyticsService.shared.logAddToFavorites(giftId: id)
                     favoriteIds.insert(id)
+                } else {
+                    AnalyticsService.shared.logRemoveFromFavorites(giftId: id)
+                    favoriteIds.remove(id)
                 }
                 save()
             }
         } catch {
-            AnalyticsService.shared.logCriticalError(scenario: "toggle_favorite", error: error, parameters: ["gift_id": id])
+            AnalyticsService.shared.logCriticalError(
+                scenario: "toggle_favorite",
+                error: error,
+                parameters: ["gift_id": id]
+            )
             throw error
         }
-    }   
-    
+    }
+
     func fetchFavoriteGifts() async throws -> [Gift] {
         guard let token = authManager.token, !token.isEmpty else {
             return []
@@ -109,9 +119,3 @@ final class FavoritesService: FavoritesServiceProtocol {
         favoriteIds = Set(ids)
     }
 }
-
-private struct FavoriteDTO: Decodable {
-    let id: Int
-}
-
-private struct EmptyResponse: Decodable {}

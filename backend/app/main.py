@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import auth, gifts, favorites, users
+from app.routers import auth, categories, favorites, gifts, users
 
 
 def create_app() -> FastAPI:
@@ -28,6 +28,8 @@ def create_app() -> FastAPI:
 
     # Routers
     app.include_router(auth.router, prefix="/auth", tags=["auth"])
+    app.include_router(users.router, prefix="/users", tags=["users"])
+    app.include_router(categories.router, prefix="/categories", tags=["categories"])
     app.include_router(gifts.router, prefix="/gifts", tags=["gifts"])
     app.include_router(favorites.router, prefix="/favorites", tags=["favorites"])
 
@@ -35,4 +37,3 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
-

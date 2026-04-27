@@ -3,22 +3,22 @@ from jose import JWTError
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db import get_session
-from models import User
-from schemas.user import (
+from app.core.db import get_session
+from app.core.security import (
+    create_access_token,
+    create_refresh_token,
+    decode_token,
+    get_password_hash,
+    verify_password,
+)
+from app.models import User
+from app.schemas.user import (
     AuthResponse,
     LoginRequest,
     RefreshTokenRequest,
     RefreshTokenResponse,
     UserCreate,
     UserRead,
-)
-from security import (
-    create_access_token,
-    create_refresh_token,
-    decode_token,
-    get_password_hash,
-    verify_password,
 )
 
 router = APIRouter()
@@ -30,10 +30,17 @@ async def register(
     session: AsyncSession = Depends(get_session),
 ) -> AuthResponse:
     """
-    Упрощённая регистрация пользователя.
-    Полноценная регистрация:
-    - проверка уникальности email/phone
-    - хэширование пароля
+    Регистрация нового пользователя.
+
+    Проверяет уникальность email/phone, хэширует пароль (pbkdf2_sha256,
+    см. комментарий в app/core/security.py о выборе алгоритма) и сразу
+    выдаёт пару access/refresh токенов. Инвариант «должен быть указан
+    хотя бы один из email/phone» проверяется в схеме UserCreate.
+
+    Из соображений продакшена пока не делаем:
+    - подтверждение email / SMS-код,
+    - rate limiting,
+    - хранение refresh-токенов в БД с возможностью отзыва.
     """
     if payload.email or payload.phone:
         stmt = select(User).where(
@@ -65,7 +72,7 @@ async def register(
     refresh_token = create_refresh_token({"sub": str(user.id)})
 
     return AuthResponse(
-        user=UserRead.from_orm(user),
+        user=UserRead.model_validate(user, from_attributes=True),
         token=token,
         refresh_token=refresh_token,
     )
@@ -99,7 +106,7 @@ async def login(
     refresh_token = create_refresh_token({"sub": str(user.id)})
 
     return AuthResponse(
-        user=UserRead.from_orm(user),
+        user=UserRead.model_validate(user, from_attributes=True),
         token=token,
         refresh_token=refresh_token,
     )
@@ -154,4 +161,3 @@ async def refresh_token(
         token=new_access_token,
         refresh_token=new_refresh_token,
     )
-
