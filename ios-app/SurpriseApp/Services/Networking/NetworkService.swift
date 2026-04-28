@@ -2,9 +2,10 @@ import Foundation
 
 // MARK: - HTTP Method
 enum HTTPMethod: String {
-    case get = "GET"
-    case post = "POST"
-    case put = "PUT"
+    case get    = "GET"
+    case post   = "POST"
+    case put    = "PUT"
+    case patch  = "PATCH"
     case delete = "DELETE"
 }
 
@@ -30,18 +31,33 @@ enum NetworkError: Error {
 // MARK: - Network Service Protocol
 protocol NetworkServiceProtocol {
     func request<T: Decodable>(_ endpoint: Endpoint) async throws -> T
+    /// Для эндпоинтов, которые возвращают 204 No Content (без тела ответа).
+    func requestVoid(_ endpoint: Endpoint) async throws
 }
 
 // MARK: - Network Service
 final class NetworkService: NetworkServiceProtocol {
+    /// Общая URLSession с укороченными таймаутами.
+    /// 60 сек по дефолту убивают холодный старт, если бэкенд недоступен —
+    /// пользователь видит «висящий» Feed. 15 сек на запрос и 20 на ресурс
+    /// дают разумный fail-fast, после которого сработает офлайн-фолбэк
+    /// в репозиториях.
+    static let sharedSession: URLSession = {
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 15
+        config.timeoutIntervalForResource = 20
+        config.waitsForConnectivity = false
+        return URLSession(configuration: config)
+    }()
+
     private actor TokenRefreshCoordinator {
         private var refreshTask: Task<Bool, Never>?
-        
+
         func runSingleRefresh(_ operation: @escaping @Sendable () async -> Bool) async -> Bool {
             if let refreshTask {
                 return await refreshTask.value
             }
-            
+
             let task = Task { await operation() }
             refreshTask = task
             let result = await task.value
@@ -75,7 +91,7 @@ final class NetworkService: NetworkServiceProtocol {
 
     init(
         baseURL: String = AppConfig.shared.apiBaseURL,
-        session: URLSession = .shared
+        session: URLSession = NetworkService.sharedSession
     ) {
         self.baseURL = baseURL
         self.session = session
@@ -121,6 +137,27 @@ final class NetworkService: NetworkServiceProtocol {
         }
     }
     
+    func requestVoid(_ endpoint: Endpoint) async throws {
+        do {
+            let (_, statusCode) = try await execute(endpoint: endpoint)
+            switch statusCode {
+            case 200...299:
+                return
+            case 401:
+                notifySessionExpiredIfNeeded(for: endpoint.path)
+                throw NetworkError.unauthorized
+            default:
+                throw NetworkError.serverError("HTTP \(statusCode)")
+            }
+        } catch let error as NetworkError {
+            throw error
+        } catch let error as URLError where error.code == .notConnectedToInternet {
+            throw NetworkError.noConnection
+        } catch {
+            throw NetworkError.unknown
+        }
+    }
+
     private func execute(endpoint: Endpoint) async throws -> (Data, Int) {
         let request = try buildRequest(endpoint: endpoint)
         let (data, response) = try await session.data(for: request)
@@ -151,7 +188,7 @@ final class NetworkService: NetworkServiceProtocol {
         }
         
         if let parameters = endpoint.bodyParameters,
-           endpoint.method == .post || endpoint.method == .put {
+           [.post, .put, .patch].contains(endpoint.method) {
             request.httpBody = try JSONSerialization.data(withJSONObject: parameters)
         }
         

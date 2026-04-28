@@ -442,15 +442,18 @@ final class GiftDetailViewController: UIViewController {
     
     // MARK: - Actions
     @objc private func didTapFavorite() {
+        HapticFeedback.like()
         viewModel.toggleFavorite()
     }
-    
+
     @objc private func didTapBuy() {
+        HapticFeedback.tap()
         AnalyticsService.shared.logBuyClick(giftId: viewModel.gift.id)
         onBuyTapped?()
     }
-    
+
     @objc private func didTapBack() {
+        HapticFeedback.tap()
         onBackTapped?()
     }
     

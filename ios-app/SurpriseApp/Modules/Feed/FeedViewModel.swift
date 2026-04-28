@@ -12,12 +12,18 @@ protocol FeedViewModelProtocol: AnyObject {
     var categories: [String] { get }
     var selectedCategoryIndex: Int { get }
 
+    /// Текущий активный фильтр бюджета.
+    var activeBudgetFilter: BudgetFilter { get }
+
     func loadInitial()
     func loadCategories() async
     func toggleFavorite(for giftId: Int)
     func searchGifts(query: String)
     func selectCategory(at index: Int)
     func refreshFavoritesState()
+
+    /// Установить фильтр бюджета и обновить отображаемую ленту.
+    func setBudgetFilter(_ filter: BudgetFilter)
 }
 
 protocol PaginatableFeedViewModelProtocol: FeedViewModelProtocol {
@@ -54,7 +60,16 @@ final class FeedViewModel: FeedViewModelProtocol {
 
     private let repository: GiftRepositoryProtocol
     private let favoritesService: FavoritesServiceProtocol
+
+    /// Полный список подарков без бюджетного фильтра (кэш для «все»).
     private var allGifts: [Gift] = []
+
+    /// Подарки текущей категории до применения бюджетного фильтра.
+    /// При «все» совпадает с allGifts.
+    private var categoryGifts: [Gift] = []
+
+    /// Активный фильтр бюджета. Применяется поверх категорийного фильтра.
+    private(set) var activeBudgetFilter: BudgetFilter = .any
 
     private var isLoadingMore: Bool = false
 
@@ -94,28 +109,47 @@ final class FeedViewModel: FeedViewModelProtocol {
         updateGiftsState([], isLoading: true)
 
         Task {
-            // Перед тем как раскрашивать сердечки, подтянем актуальные favorites
-            // с сервера. Без этого локальный UserDefaults-кэш мог остаться от
-            // прошлой сессии (или быть пустым на свежем запуске), и Лента
-            // показывала бы инверсное состояние относительно сервера.
-            try? await favoritesService.syncFromServer()
+            // Все три запроса не зависят друг от друга — пускаем параллельно
+            // вместо строгого await-await-await. На холодном старте это
+            // главное, что убирает «застывший» спиннер.
+            async let favoritesSyncResult: Void = {
+                _ = try? await favoritesService.syncFromServer()
+            }()
 
-            if availableCategories.isEmpty {
-                await loadCategories()
-            }
+            async let categoriesResult: Void = {
+                if await self.availableCategories.isEmpty {
+                    await self.loadCategories()
+                }
+            }()
 
-            do {
-                let recommendedGifts = try await repository.getRecommendedGifts()
+            async let recommendedResult: Result<[Gift], Error> = {
+                do {
+                    let gifts = try await repository.getRecommendedGifts()
+                    return .success(gifts)
+                } catch {
+                    return .failure(error)
+                }
+            }()
+
+            // Дожидаемся всех. favorites/categories — fire-and-forget по сути,
+            // recommended — единственный, чей результат блокирует UI.
+            _ = await favoritesSyncResult
+            _ = await categoriesResult
+            let result = await recommendedResult
+
+            switch result {
+            case .success(let recommendedGifts):
                 let giftsWithFavorites = applyFavoritesState(to: recommendedGifts)
                 await MainActor.run {
-                    updateGiftsState(giftsWithFavorites)
                     self.allGifts = giftsWithFavorites
+                    self.categoryGifts = giftsWithFavorites
+                    self.updateGiftsState(self.applyBudgetFilter(giftsWithFavorites))
                     self.canLoadMore = false
                 }
-            } catch {
+            case .failure(let error):
                 AnalyticsService.shared.logCriticalError(scenario: "load_initial", error: error)
                 await MainActor.run {
-                    updateGiftsState([], isLoading: false, error: "Не удалось загрузить подарки")
+                    self.updateGiftsState([], isLoading: false, error: "Не удалось загрузить подарки")
                     self.canLoadMore = false
                 }
             }
@@ -128,12 +162,19 @@ final class FeedViewModel: FeedViewModelProtocol {
 
         if index == 0 {
             // "все" — никакой фильтрации, показываем закешированный allGifts
-            updateGiftsState(allGifts)
+            categoryGifts = allGifts
+            updateGiftsState(applyBudgetFilter(allGifts))
             return
         }
 
         let category = availableCategories[index - 1]
         loadGifts(filteredBy: category)
+    }
+
+    func setBudgetFilter(_ filter: BudgetFilter) {
+        activeBudgetFilter = filter
+        // Переприменяем к базовому списку текущей категории
+        updateGiftsState(applyBudgetFilter(categoryGifts))
     }
 
     func loadMoreIfNeeded(currentIndex: Int) {
@@ -149,7 +190,11 @@ final class FeedViewModel: FeedViewModelProtocol {
             try? await favoritesService.syncFromServer()
             await MainActor.run {
                 let updatedGifts = self.applyFavoritesState(to: self.allGifts)
-                self.updateGiftsState(updatedGifts)
+                self.allGifts = updatedGifts
+                // categoryGifts — тоже обновляем favorites, не трогая фильтр
+                let updatedCategory = self.applyFavoritesState(to: self.categoryGifts)
+                self.categoryGifts = updatedCategory
+                self.updateGiftsState(self.applyBudgetFilter(updatedCategory))
             }
         }
     }
@@ -174,15 +219,27 @@ final class FeedViewModel: FeedViewModelProtocol {
                     if gift.id == giftId { copy.isFavorite = newIsFavorite }
                     return copy
                 }
+                let updatedCategory = self.categoryGifts.map { gift -> Gift in
+                    var copy = gift
+                    if gift.id == giftId { copy.isFavorite = newIsFavorite }
+                    return copy
+                }
 
                 await MainActor.run {
                     self.allGifts = updatedAll
+                    self.categoryGifts = updatedCategory
                     updateGiftsState(updatedDisplayed)
+                    Toast.show(
+                        newIsFavorite
+                            ? "Подарок добавлен в избранное"
+                            : "Подарок убран из избранного"
+                    )
                 }
             } catch {
                 await MainActor.run {
                     errorMessage = "Не удалось обновить избранное"
                     onStateChanged?()
+                    Toast.show("Не удалось обновить избранное")
                 }
             }
         }
@@ -190,7 +247,7 @@ final class FeedViewModel: FeedViewModelProtocol {
 
     func searchGifts(query: String) {
         if query.isEmpty {
-            updateGiftsState(allGifts)
+            updateGiftsState(applyBudgetFilter(categoryGifts))
             return
         }
 
@@ -199,15 +256,15 @@ final class FeedViewModel: FeedViewModelProtocol {
                 let rawResults = try await repository.search(query: query)
                 let results = applyFavoritesState(to: rawResults)
                 await MainActor.run {
-                    updateGiftsState(results)
+                    updateGiftsState(self.applyBudgetFilter(results))
                 }
             } catch {
                 await MainActor.run {
-                    let localResults = allGifts.filter {
+                    let localResults = self.categoryGifts.filter {
                         $0.name.lowercased().contains(query.lowercased()) ||
                         $0.description?.lowercased().contains(query.lowercased()) == true
                     }
-                    updateGiftsState(localResults)
+                    updateGiftsState(self.applyBudgetFilter(localResults))
                 }
             }
         }
@@ -221,7 +278,8 @@ final class FeedViewModel: FeedViewModelProtocol {
                 let rawResults = try await repository.getByCategory(id: category.id)
                 let results = applyFavoritesState(to: rawResults)
                 await MainActor.run {
-                    updateGiftsState(results)
+                    self.categoryGifts = results
+                    updateGiftsState(self.applyBudgetFilter(results))
                 }
             } catch {
                 AnalyticsService.shared.logCriticalError(
@@ -230,10 +288,11 @@ final class FeedViewModel: FeedViewModelProtocol {
                     parameters: ["category_id": category.id, "category_name": category.name]
                 )
                 await MainActor.run {
-                    let localResults = allGifts.filter { gift in
+                    let localResults = self.allGifts.filter { gift in
                         gift.categories.contains(where: { $0.id == category.id })
                     }
-                    updateGiftsState(localResults)
+                    self.categoryGifts = localResults
+                    updateGiftsState(self.applyBudgetFilter(localResults))
                 }
             }
         }
@@ -249,11 +308,15 @@ final class FeedViewModel: FeedViewModelProtocol {
 
     private func applyFavoritesState(to gifts: [Gift]) -> [Gift] {
         let favoriteIds = favoritesService.getFavoriteIds()
-
         return gifts.map { gift in
             var copy = gift
             copy.isFavorite = favoriteIds.contains(gift.id)
             return copy
         }
+    }
+
+    /// Применяет активный бюджетный фильтр к списку подарков.
+    private func applyBudgetFilter(_ gifts: [Gift]) -> [Gift] {
+        activeBudgetFilter.apply(to: gifts)
     }
 }

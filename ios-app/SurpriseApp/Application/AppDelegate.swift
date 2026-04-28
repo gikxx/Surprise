@@ -5,10 +5,17 @@ import YandexMobileMetrica
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
-        // Инициализация AppMetrica
+
+        // Прогреваем CoreData заранее на фоновом потоке
+        DispatchQueue.global(qos: .userInitiated).async {
+            _ = CoreDataStack.shared.persistentContainer
+        }
+
         AnalyticsService.shared.logAppLaunch()
-        
+
+        // Локальные уведомления о праздниках
+        NotificationManager.shared.requestAuthorizationIfNeeded()
+
         return true
     }
 

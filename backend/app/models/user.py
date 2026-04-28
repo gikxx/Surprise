@@ -30,3 +30,10 @@ class User(Base):
         back_populates="liked_by",
         lazy="selectin",
     )
+
+    persons: Mapped[List["Person"]] = relationship(  # noqa: F821
+        "Person",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )

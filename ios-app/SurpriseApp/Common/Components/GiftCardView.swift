@@ -101,6 +101,7 @@ final class GiftCardView: UIView {
     }
     
     @objc private func didTapFavorite() {
+        HapticFeedback.like()
         onFavoriteTapped?()
     }
 }

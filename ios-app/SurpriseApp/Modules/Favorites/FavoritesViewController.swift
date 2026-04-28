@@ -5,6 +5,11 @@ final class FavoritesViewController: UIViewController {
     
     private let viewModel: FavoritesViewModelProtocol
     private var collectionView: UICollectionView!
+
+    private var activeBanner: UndoBannerView?
+    private var pendingBannerGiftId: Int?
+
+    private let bannerBottomOffset: CGFloat = 100
     
     private let emptyLabel: UILabel = {
         let label = UILabel()
@@ -33,11 +38,21 @@ final class FavoritesViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .appBackground
-        
+
         setupHeader()
         setupCollectionView()
         setupEmptyState()
         bindViewModel()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(scrollToTop),
+            name: .scrollFavoritesToTop,
+            object: nil
+        )
+    }
+
+    @objc private func scrollToTop() {
+        collectionView.setContentOffset(.zero, animated: true)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -119,6 +134,34 @@ final class FavoritesViewController: UIViewController {
         viewModel.onStateChanged = { [weak self] in
             self?.applyState()
         }
+
+        viewModel.onRemovalPending = { [weak self] giftId in
+            self?.showUndoBanner(for: giftId)
+        }
+    }
+
+    // MARK: - Undo Banner
+
+    private func showUndoBanner(for giftId: Int) {
+        activeBanner?.dismiss(animated: false)
+
+        let banner = UndoBannerView()
+        activeBanner = banner
+        pendingBannerGiftId = giftId
+
+        banner.onUndo = { [weak self] in
+            guard let self else { return }
+            self.viewModel.undoRemoval(of: giftId)
+            self.activeBanner = nil
+            self.pendingBannerGiftId = nil
+        }
+
+        banner.onExpired = { [weak self] in
+            self?.activeBanner = nil
+            self?.pendingBannerGiftId = nil
+        }
+
+        banner.show(in: view, bottomOffset: bannerBottomOffset)
     }
     
     private func applyState() {

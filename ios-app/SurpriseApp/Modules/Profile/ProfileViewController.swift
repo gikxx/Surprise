@@ -2,6 +2,7 @@ import UIKit
 
 final class ProfileViewController: UIViewController {
     var onSettingsTapped: (() -> Void)?
+    var onPersonsTapped: (() -> Void)?
     var onSupportTapped: (() -> Void)?
     var onClientInfoTapped: (() -> Void)?
     
@@ -36,6 +37,7 @@ final class ProfileViewController: UIViewController {
     }()
     
     private let settingsButton = UIButton.createPrimary(title: "настройки профиля")
+    private let personsButton = UIButton.createPrimary(title: "мои близкие")
     private let supportButton = UIButton.createPrimary(title: "написать в поддержку")
     private let infoButton = UIButton.createPrimary(title: "инфо для клиента")
     
@@ -73,7 +75,7 @@ final class ProfileViewController: UIViewController {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         
-        [titleLabel, avatarImageView, nameLabel, settingsButton, supportButton, infoButton].forEach {
+        [titleLabel, avatarImageView, nameLabel, settingsButton, personsButton, supportButton, infoButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             contentView.addSubview($0)
         }
@@ -108,12 +110,17 @@ final class ProfileViewController: UIViewController {
             settingsButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             settingsButton.widthAnchor.constraint(equalToConstant: buttonWidth),
             settingsButton.heightAnchor.constraint(equalToConstant: buttonHeight),
-            
-            supportButton.topAnchor.constraint(equalTo: settingsButton.bottomAnchor, constant: 24),
+
+            personsButton.topAnchor.constraint(equalTo: settingsButton.bottomAnchor, constant: 24),
+            personsButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            personsButton.widthAnchor.constraint(equalToConstant: buttonWidth),
+            personsButton.heightAnchor.constraint(equalToConstant: buttonHeight),
+
+            supportButton.topAnchor.constraint(equalTo: personsButton.bottomAnchor, constant: 24),
             supportButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             supportButton.widthAnchor.constraint(equalToConstant: buttonWidth),
             supportButton.heightAnchor.constraint(equalToConstant: buttonHeight),
-            
+
             infoButton.topAnchor.constraint(equalTo: supportButton.bottomAnchor, constant: 24),
             infoButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             infoButton.widthAnchor.constraint(equalToConstant: buttonWidth),
@@ -122,6 +129,7 @@ final class ProfileViewController: UIViewController {
         ])
         
         settingsButton.addTarget(self, action: #selector(didTapSettings), for: .touchUpInside)
+        personsButton.addTarget(self, action: #selector(didTapPersons), for: .touchUpInside)
         supportButton.addTarget(self, action: #selector(didTapSupport), for: .touchUpInside)
         infoButton.addTarget(self, action: #selector(didTapInfo), for: .touchUpInside)
     }
@@ -136,8 +144,10 @@ final class ProfileViewController: UIViewController {
         updateAvatarImage()
         if currentUser.isGuest {
             settingsButton.setTitle("зарегистрироваться", for: .normal)
+            personsButton.isHidden = true
         } else {
             settingsButton.setTitle("настройки профиля", for: .normal)
+            personsButton.isHidden = false
         }
     }
     
@@ -146,16 +156,24 @@ final class ProfileViewController: UIViewController {
             avatarImageView.image = UIImage(named: "blue_star")
             return
         }
+        if urlString.hasPrefix("local://") {
+            avatarImageView.image = AvatarLocalStorage.loadImage() ?? UIImage(named: "blue_star")
+            return
+        }
         if urlString.hasPrefix("builtin://") {
             let imageName = (urlString == "builtin://pink_star") ? "pink_star" : "blue_star"
             avatarImageView.image = UIImage(named: imageName)
-        } else {
-            avatarImageView.image = UIImage(named: "blue_star")
+            return
         }
+        avatarImageView.image = UIImage(named: "blue_star")
     }
     
     @objc private func didTapSettings() {
         onSettingsTapped?()
+    }
+
+    @objc private func didTapPersons() {
+        onPersonsTapped?()
     }
     
     @objc private func didTapSupport() {

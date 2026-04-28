@@ -103,6 +103,7 @@ final class AuthManager {
         userEmail = nil
         userPhone = nil
         userAvatarUrl = nil
+        AvatarLocalStorage.clear()
         isGuest = true
     }
     
@@ -114,6 +115,7 @@ final class AuthManager {
         userEmail = nil
         userPhone = nil
         userAvatarUrl = nil
+        AvatarLocalStorage.clear()
         isGuest = false
     }
 }

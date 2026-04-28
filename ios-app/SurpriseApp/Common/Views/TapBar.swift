@@ -3,6 +3,10 @@ import UIKit
 final class TapBar: UIView {
     
     var onTabSelected: ((Int) -> Void)?
+    /// Вызывается когда пользователь тапает по уже активному табу
+    var onTabReselected: ((Int) -> Void)?
+
+    private var currentSelectedIndex: Int = 0
     
     private let stackView: UIStackView = {
         let stack = UIStackView()
@@ -83,11 +87,16 @@ final class TapBar: UIView {
     }
     
     @objc private func handleTap(_ sender: UIButton) {
-        onTabSelected?(sender.tag)
-        updateAppearance(selectedIndex: sender.tag)
+        if sender.tag == currentSelectedIndex {
+            onTabReselected?(sender.tag)
+        } else {
+            onTabSelected?(sender.tag)
+            updateAppearance(selectedIndex: sender.tag)
+        }
     }
-    
+
     func updateAppearance(selectedIndex: Int) {
+        currentSelectedIndex = selectedIndex
         buttons.enumerated().forEach { index, button in
             // Активная кнопка получает яркую иконку (appPrimary)
             button.tintColor = (index == selectedIndex) ? .appPrimary : .appBackground

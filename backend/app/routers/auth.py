@@ -8,6 +8,7 @@ from app.core.security import (
     create_access_token,
     create_refresh_token,
     decode_token,
+    get_current_user,
     get_password_hash,
     verify_password,
 )
@@ -42,19 +43,21 @@ async def register(
     - rate limiting,
     - хранение refresh-токенов в БД с возможностью отзыва.
     """
-    if payload.email or payload.phone:
-        stmt = select(User).where(
-            or_(
-                User.email == payload.email,
-                User.phone == payload.phone,
-            )
-        )
-        result = await session.execute(stmt)
-        existing = result.scalar_one_or_none()
-        if existing:
+    if payload.email:
+        stmt_email = select(User).where(User.email == payload.email)
+        result_email = await session.execute(stmt_email)
+        if result_email.scalar_one_or_none():
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User with this email or phone already exists",
+                detail="User with this email already exists",
+            )
+    if payload.phone:
+        stmt_phone = select(User).where(User.phone == payload.phone)
+        result_phone = await session.execute(stmt_phone)
+        if result_phone.scalar_one_or_none():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User with this phone already exists",
             )
 
     user = User(
@@ -161,3 +164,16 @@ async def refresh_token(
         token=new_access_token,
         refresh_token=new_refresh_token,
     )
+
+
+@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_account(
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> None:
+    """
+    Удаление аккаунта текущего пользователя.
+    Каскадно удаляет всех persons и избранное (cascade настроен на уровне модели).
+    """
+    await session.delete(current_user)
+    await session.commit()

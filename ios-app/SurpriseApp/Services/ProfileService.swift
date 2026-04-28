@@ -3,7 +3,8 @@ import Foundation
 protocol ProfileServiceProtocol {
     func fetchProfile() async throws -> User
     func updateProfile(name: String?, email: String?, phone: String?) async throws -> User
-    func updateAvatar(url: String) async throws -> User   
+    func updateAvatar(url: String) async throws -> User
+    func deleteAccount() async throws
 }
 
 final class ProfileService: ProfileServiceProtocol {
@@ -47,5 +48,10 @@ final class ProfileService: ProfileServiceProtocol {
             bodyParameters: ["avatar_url": url]
         )
         return try await networkService.request(endpoint)
+    }
+
+    func deleteAccount() async throws {
+        let endpoint = Endpoint(path: "/auth/me", method: .delete)
+        try await networkService.requestVoid(endpoint)
     }
 }

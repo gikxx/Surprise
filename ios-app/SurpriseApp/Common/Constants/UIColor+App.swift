@@ -27,6 +27,9 @@ extension UIColor {
     
     /// Цвет картинок (голубой)
     static let appImageBlue = UIColor(hex: "#7EBFFF")
+
+    /// Цвет деструктивных действий (удаление)
+    static let appDestructive = UIColor(hex: "#E86869")
     
     // MARK: - Helper Init
     convenience init(hex: String) {

@@ -1,10 +1,12 @@
 import UIKit
+import PhotosUI
 
 final class ProfileSettingsViewController: UIViewController {
     var onBack: (() -> Void)?
     var onSave: ((String?, String?, String?) -> Void)?
     var onAvatarSelected: ((String) -> Void)?
-    
+    var onDeleteAccount: (() -> Void)?
+
     private let initialUser: User
     private var currentAvatarUrl: String?
     
@@ -34,7 +36,33 @@ final class ProfileSettingsViewController: UIViewController {
         iv.isUserInteractionEnabled = true
         return iv
     }()
-    
+
+    private let photoAvatarContainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .appWhite
+        view.layer.cornerRadius = 60
+        view.clipsToBounds = true
+        view.isUserInteractionEnabled = true
+        view.layer.borderWidth = 2
+        view.layer.borderColor = UIColor.appSecondary.cgColor
+        return view
+    }()
+
+    private let photoAvatarImageView: UIImageView = {
+        let iv = UIImageView()
+        iv.contentMode = .scaleAspectFill
+        iv.clipsToBounds = true
+        return iv
+    }()
+
+    private let photoAvatarPlaceholderIcon: UIImageView = {
+        let cfg = UIImage.SymbolConfiguration(pointSize: 30, weight: .light)
+        let iv = UIImageView(image: UIImage(systemName: "camera", withConfiguration: cfg))
+        iv.tintColor = .appSecondary
+        iv.contentMode = .scaleAspectFit
+        return iv
+    }()
+
     private let leftCheckmarkLabel: UILabel = {
         let label = UILabel()
         label.text = "✓"
@@ -45,6 +73,15 @@ final class ProfileSettingsViewController: UIViewController {
     }()
 
     private let rightCheckmarkLabel: UILabel = {
+        let label = UILabel()
+        label.text = "✓"
+        label.font = .helveticaBold(size: 42)
+        label.textColor = .appSecondary
+        label.isHidden = true
+        return label
+    }()
+
+    private let photoCheckmarkLabel: UILabel = {
         let label = UILabel()
         label.text = "✓"
         label.font = .helveticaBold(size: 42)
@@ -77,6 +114,15 @@ final class ProfileSettingsViewController: UIViewController {
     private let phoneField = UITextField.createWithLabel(title: "телефон")
     
     private let saveButton = UIButton.createPrimary(title: "сохранить")
+
+    private let deleteAccountButton: RoundedButton = {
+        let btn = RoundedButton(type: .system)
+        btn.setTitle("удалить аккаунт", for: .normal)
+        btn.backgroundColor = .appSecondary
+        btn.setTitleColor(.appTextSecondary, for: .normal)
+        btn.titleLabel?.font = .helveticaRegular(size: 21)
+        return btn
+    }()
     
     init(user: User) {
         self.initialUser = user
@@ -134,12 +180,17 @@ final class ProfileSettingsViewController: UIViewController {
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
         ])
         
-        [titleLabel, blueStarImageView, pinkStarImageView,
+        [titleLabel, blueStarImageView, pinkStarImageView, photoAvatarContainer,
          sectionTitleLabel, sectionSubtitleLabel,
-         nameField, emailField, phoneField, saveButton,
-         leftCheckmarkLabel, rightCheckmarkLabel].forEach {
+         nameField, emailField, phoneField, saveButton, deleteAccountButton,
+         leftCheckmarkLabel, rightCheckmarkLabel, photoCheckmarkLabel].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             contentView.addSubview($0)
+        }
+
+        [photoAvatarImageView, photoAvatarPlaceholderIcon].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            photoAvatarContainer.addSubview($0)
         }
         
         NSLayoutConstraint.activate([
@@ -158,11 +209,30 @@ final class ProfileSettingsViewController: UIViewController {
             
             leftCheckmarkLabel.topAnchor.constraint(equalTo: blueStarImageView.topAnchor, constant: -12),
             leftCheckmarkLabel.trailingAnchor.constraint(equalTo: blueStarImageView.trailingAnchor, constant: 12),
-            
+
             rightCheckmarkLabel.topAnchor.constraint(equalTo: pinkStarImageView.topAnchor, constant: -12),
             rightCheckmarkLabel.trailingAnchor.constraint(equalTo: pinkStarImageView.trailingAnchor, constant: 12),
-            
-            sectionTitleLabel.topAnchor.constraint(equalTo: blueStarImageView.bottomAnchor, constant: 24),
+
+            // Третий вариант — фото из галереи. Кладём по центру под звёздами.
+            photoAvatarContainer.topAnchor.constraint(equalTo: blueStarImageView.bottomAnchor, constant: 12),
+            photoAvatarContainer.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            photoAvatarContainer.widthAnchor.constraint(equalToConstant: 120),
+            photoAvatarContainer.heightAnchor.constraint(equalToConstant: 120),
+
+            photoAvatarImageView.topAnchor.constraint(equalTo: photoAvatarContainer.topAnchor),
+            photoAvatarImageView.leadingAnchor.constraint(equalTo: photoAvatarContainer.leadingAnchor),
+            photoAvatarImageView.trailingAnchor.constraint(equalTo: photoAvatarContainer.trailingAnchor),
+            photoAvatarImageView.bottomAnchor.constraint(equalTo: photoAvatarContainer.bottomAnchor),
+
+            photoAvatarPlaceholderIcon.centerXAnchor.constraint(equalTo: photoAvatarContainer.centerXAnchor),
+            photoAvatarPlaceholderIcon.centerYAnchor.constraint(equalTo: photoAvatarContainer.centerYAnchor),
+            photoAvatarPlaceholderIcon.widthAnchor.constraint(equalToConstant: 36),
+            photoAvatarPlaceholderIcon.heightAnchor.constraint(equalToConstant: 36),
+
+            photoCheckmarkLabel.topAnchor.constraint(equalTo: photoAvatarContainer.topAnchor, constant: -12),
+            photoCheckmarkLabel.trailingAnchor.constraint(equalTo: photoAvatarContainer.trailingAnchor, constant: 12),
+
+            sectionTitleLabel.topAnchor.constraint(equalTo: photoAvatarContainer.bottomAnchor, constant: 24),
             sectionTitleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
             sectionSubtitleLabel.topAnchor.constraint(equalTo: sectionTitleLabel.bottomAnchor, constant: 6),
@@ -184,10 +254,16 @@ final class ProfileSettingsViewController: UIViewController {
             saveButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             saveButton.widthAnchor.constraint(equalToConstant: 220),
             saveButton.heightAnchor.constraint(equalToConstant: 55),
-            saveButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -140)
+
+            deleteAccountButton.topAnchor.constraint(equalTo: saveButton.bottomAnchor, constant: 12),
+            deleteAccountButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            deleteAccountButton.widthAnchor.constraint(equalToConstant: 220),
+            deleteAccountButton.heightAnchor.constraint(equalToConstant: 55),
+            deleteAccountButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -120),
         ])
-        
+
         saveButton.addTarget(self, action: #selector(didTapSave), for: .touchUpInside)
+        deleteAccountButton.addTarget(self, action: #selector(didTapDeleteAccount), for: .touchUpInside)
     }
     
     private func prefillFields() {
@@ -199,31 +275,97 @@ final class ProfileSettingsViewController: UIViewController {
     private func setupAvatarSelection() {
         let tapBlue = UITapGestureRecognizer(target: self, action: #selector(didTapBlueAvatar))
         blueStarImageView.addGestureRecognizer(tapBlue)
-        
+
         let tapPink = UITapGestureRecognizer(target: self, action: #selector(didTapPinkAvatar))
         pinkStarImageView.addGestureRecognizer(tapPink)
+
+        let tapPhoto = UITapGestureRecognizer(target: self, action: #selector(didTapPhotoAvatar))
+        photoAvatarContainer.addGestureRecognizer(tapPhoto)
+
+        refreshPhotoPreview()
     }
-    
+
     @objc private func didTapBlueAvatar() {
+        HapticFeedback.selection()
         let avatarUrl = "builtin://blue_star"
         onAvatarSelected?(avatarUrl)
         currentAvatarUrl = avatarUrl
         highlightSelectedAvatar()
     }
-    
+
     @objc private func didTapPinkAvatar() {
+        HapticFeedback.selection()
         let avatarUrl = "builtin://pink_star"
         onAvatarSelected?(avatarUrl)
         currentAvatarUrl = avatarUrl
         highlightSelectedAvatar()
     }
-    
+
+    @objc private func didTapPhotoAvatar() {
+        HapticFeedback.tap()
+
+        let sheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+
+        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+            sheet.addAction(UIAlertAction(title: "Сфотографироваться", style: .default) { [weak self] _ in
+                self?.presentCamera()
+            })
+        }
+
+        sheet.addAction(UIAlertAction(title: "Выбрать из галереи", style: .default) { [weak self] _ in
+            self?.presentPhotoPicker()
+        })
+
+        sheet.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+
+        if let popover = sheet.popoverPresentationController {
+            popover.sourceView = photoAvatarContainer
+            popover.sourceRect = photoAvatarContainer.bounds
+        }
+
+        present(sheet, animated: true)
+    }
+
+    private func presentCamera() {
+        let picker = UIImagePickerController()
+        picker.sourceType = .camera
+        picker.cameraCaptureMode = .photo
+        picker.allowsEditing = false
+        picker.delegate = self
+        present(picker, animated: true)
+    }
+
+    private func presentPhotoPicker() {
+        var config = PHPickerConfiguration(photoLibrary: .shared())
+        config.filter = .images
+        config.selectionLimit = 1
+        config.preferredAssetRepresentationMode = .current
+
+        let picker = PHPickerViewController(configuration: config)
+        picker.delegate = self
+        present(picker, animated: true)
+    }
+
     private func highlightSelectedAvatar() {
         let isBlueSelected = (currentAvatarUrl == "builtin://blue_star")
         let isPinkSelected = (currentAvatarUrl == "builtin://pink_star")
+        let isCustomPhotoSelected = (currentAvatarUrl == AvatarLocalStorage.urlString)
 
         leftCheckmarkLabel.isHidden = !isBlueSelected
         rightCheckmarkLabel.isHidden = !isPinkSelected
+        photoCheckmarkLabel.isHidden = !isCustomPhotoSelected
+    }
+
+    /// Обновляет превью загруженного локально фото в третьем кружке.
+    /// Если фото нет — показываем placeholder с плюсом.
+    private func refreshPhotoPreview() {
+        if let image = AvatarLocalStorage.loadImage() {
+            photoAvatarImageView.image = image
+            photoAvatarPlaceholderIcon.isHidden = true
+        } else {
+            photoAvatarImageView.image = nil
+            photoAvatarPlaceholderIcon.isHidden = false
+        }
     }
     
     private func setupKeyboardHandling() {
@@ -275,6 +417,19 @@ final class ProfileSettingsViewController: UIViewController {
         onSave?(name, email.isEmpty ? nil : email, phone.isEmpty ? nil : phone)
     }
 
+    @objc private func didTapDeleteAccount() {
+        HapticFeedback.selection()
+        let alertView = ConfirmationAlertView(
+            title: "Внимание!",
+            message: "Все ваши данные будут удалены безвозвратно. Это действие нельзя отменить.",
+            confirmTitle: "удалить аккаунт"
+        )
+        alertView.onConfirm = { [weak self] in
+            self?.onDeleteAccount?()
+        }
+        alertView.show(in: view)
+    }
+
     func updateUser(_ user: User) {
         currentAvatarUrl = user.avatarUrl
         highlightSelectedAvatar()
@@ -304,5 +459,69 @@ extension ProfileSettingsViewController: UITextFieldDelegate {
             textField.resignFirstResponder()
         }
         return true
+    }
+}
+
+// MARK: - UIImagePickerControllerDelegate (камера)
+
+extension ProfileSettingsViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+
+    func imagePickerController(
+        _ picker: UIImagePickerController,
+        didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
+    ) {
+        picker.dismiss(animated: true)
+
+        let image = info[.originalImage] as? UIImage
+
+        guard let image else { return }
+
+        handlePickedImage(image)
+    }
+
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true)
+    }
+}
+
+// MARK: - PHPickerViewControllerDelegate (галерея)
+
+extension ProfileSettingsViewController: PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+
+        guard let provider = results.first?.itemProvider,
+              provider.canLoadObject(ofClass: UIImage.self)
+        else { return }
+
+        provider.loadObject(ofClass: UIImage.self) { [weak self] object, error in
+            guard let self,
+                  let image = object as? UIImage,
+                  error == nil
+            else { return }
+
+            DispatchQueue.main.async {
+                self.handlePickedImage(image)
+            }
+        }
+    }
+}
+
+// MARK: - Shared image handling
+
+private extension ProfileSettingsViewController {
+
+    /// Единая точка сохранения фото — используется и камерой, и галереей.
+    func handlePickedImage(_ image: UIImage) {
+        guard let savedUrl = AvatarLocalStorage.save(image: image) else {
+            HapticFeedback.warning()
+            showAlert(message: "Не удалось сохранить фото. Попробуйте ещё раз.")
+            return
+        }
+        HapticFeedback.success()
+        currentAvatarUrl = savedUrl
+        refreshPhotoPreview()
+        highlightSelectedAvatar()
+        onAvatarSelected?(savedUrl)
     }
 }

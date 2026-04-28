@@ -32,7 +32,7 @@ final class GiftDataLoader {
     func loadInitialGiftsIfNeeded() {
         let context = coreDataStack.newBackgroundContext()
         
-        context.performAndWait {
+        context.perform {
             let request: NSFetchRequest<GiftEntity> = GiftEntity.fetchRequest()
             request.fetchLimit = 1
             

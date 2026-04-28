@@ -2,10 +2,21 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>surprise</string>
+			</array>
+		</dict>
+	</array>
 	<key>API_BASE_URL</key>
-	<string>http://178.154.215.82</string>
-    <key>APPMETRICA_API_KEY</key>
-    <string>a5cbde0a-e409-4de9-8243-41659c6e43ce</string>
+	<string>http://81.26.181.220</string>
+	<key>APPMETRICA_API_KEY</key>
+	<string>a5cbde0a-e409-4de9-8243-41659c6e43ce</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Чтобы сделать фото для аватара профиля</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -15,6 +26,13 @@
 	<array>
 		<string>miamanueva.otf</string>
 	</array>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchBackground</string>
+		<key>UIImageRespectsSafeAreaInsets</key>
+		<true/>
+	</dict>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

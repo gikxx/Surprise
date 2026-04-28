@@ -87,6 +87,9 @@ final class ProfileCoordinator: Coordinator {
                 self?.showSettings()
             }
         }
+        profileVC.onPersonsTapped = { [weak self] in
+            self?.showPersons()
+        }
         profileVC.onSupportTapped = { [weak self] in
             self?.showSupportInfo()
         }
@@ -145,6 +148,23 @@ final class ProfileCoordinator: Coordinator {
             }
         }
         
+        settingsVC.onDeleteAccount = { [weak self] in
+            guard let self else { return }
+            Task {
+                do {
+                    try await self.profileService.deleteAccount()
+                    await MainActor.run {
+                        self.authManager.logout()
+                        NotificationCenter.default.post(name: .accountDeleted, object: nil)
+                    }
+                } catch {
+                    await MainActor.run {
+                        self.showAlert(message: "Не удалось удалить аккаунт. Попробуй позже.")
+                    }
+                }
+            }
+        }
+
         settingsVC.onAvatarSelected = { [weak self] avatarUrl in
             Task {
                 do {
@@ -167,6 +187,12 @@ final class ProfileCoordinator: Coordinator {
             }
         }
         navigationController.pushViewController(settingsVC, animated: true)
+    }
+
+    private func showPersons() {
+        let viewModel = PersonsViewModel()
+        let personsVC = PersonsViewController(viewModel: viewModel)
+        navigationController.pushViewController(personsVC, animated: true)
     }
 
     private func showAuth() {
