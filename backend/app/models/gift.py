@@ -12,7 +12,7 @@ SQLAlchemy игнорирует «лишние» колонки в БД.
 from datetime import datetime, timezone
 from typing import List, Optional
 
-from sqlalchemy import DateTime, Float, Integer, String, Text, func
+from sqlalchemy import DateTime, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.db import Base
@@ -24,7 +24,7 @@ class Gift(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text)
-    price: Mapped[float] = mapped_column(Float, nullable=False)
+    price: Mapped[int] = mapped_column(Integer, nullable=False)
     image_url: Mapped[str] = mapped_column(String(1024), nullable=False)
     store_name: Mapped[Optional[str]] = mapped_column(String(255))
     store_url: Mapped[Optional[str]] = mapped_column(String(1024))
