@@ -1,11 +1,10 @@
 from typing import List
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_session
-from app.models import Category
+from app.crud import categories as crud_categories
 from app.schemas.category import CategoryRead
 
 router = APIRouter()
@@ -19,7 +18,4 @@ async def list_categories(
     Список всех категорий, отсортированный по имени.
     Используется на iOS для построения чипсов фильтра в FeedViewController.
     """
-    stmt = select(Category).order_by(Category.name)
-    result = await session.execute(stmt)
-    categories = result.scalars().all()
-    return [CategoryRead.model_validate(c, from_attributes=True) for c in categories]
+    return await crud_categories.list_all(session)

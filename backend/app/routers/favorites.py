@@ -1,12 +1,13 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_session
 from app.core.security import get_current_user
-from app.models import Gift, User, favorites_table
+from app.crud import favorites as crud_favorites
+from app.crud import gifts as crud_gifts
+from app.models import User
 from app.schemas.gift import GiftRead
 
 router = APIRouter()
@@ -21,18 +22,7 @@ async def get_favorites(
     Список избранного текущего юзера, отсортированный по дате добавления
     (сначала свежее). Дата берётся из favorites.created_at, не из gifts.created_at.
     """
-    stmt = (
-        select(Gift)
-        .join(favorites_table, favorites_table.c.gift_id == Gift.id)
-        .where(favorites_table.c.user_id == current_user.id)
-        .order_by(favorites_table.c.created_at.desc())
-    )
-    result = await session.execute(stmt)
-    gifts = result.scalars().all()
-    return [
-        GiftRead.model_validate(gift, from_attributes=True).model_copy(update={"is_favorite": True})
-        for gift in gifts
-    ]
+    return await crud_favorites.get_favorites(session=session, user=current_user)
 
 
 @router.post("/{gift_id}", response_model=GiftRead, status_code=status.HTTP_201_CREATED)
@@ -42,18 +32,11 @@ async def add_favorite(
     session: AsyncSession = Depends(get_session),
 ) -> GiftRead:
     """Идемпотентный add: если уже в избранном — просто вернёт текущее состояние."""
-    gift = await session.get(Gift, gift_id)
+    gift = await crud_gifts.get_by_id(session, gift_id)
     if gift is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Gift not found",
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Gift not found")
 
-    if gift not in current_user.favorites:
-        current_user.favorites.append(gift)
-        await session.commit()
-        await session.refresh(gift)
-
+    await crud_favorites.add(session=session, user=current_user, gift=gift)
     return GiftRead.model_validate(gift, from_attributes=True).model_copy(update={"is_favorite": True})
 
 
@@ -64,18 +47,11 @@ async def remove_favorite(
     session: AsyncSession = Depends(get_session),
 ) -> GiftRead:
     """Идемпотентный remove: если не в избранном — просто вернёт is_favorite=false."""
-    gift = await session.get(Gift, gift_id)
+    gift = await crud_gifts.get_by_id(session, gift_id)
     if gift is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Gift not found",
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Gift not found")
 
-    if gift in current_user.favorites:
-        current_user.favorites.remove(gift)
-        await session.commit()
-        await session.refresh(gift)
-
+    await crud_favorites.remove(session=session, user=current_user, gift=gift)
     return GiftRead.model_validate(gift, from_attributes=True).model_copy(update={"is_favorite": False})
 
 
@@ -90,21 +66,9 @@ async def toggle_favorite(
     (FavoritesService использует /favorites/{id}/toggle).
     Внутри — то же самое, что POST + DELETE по состоянию.
     """
-    gift = await session.get(Gift, gift_id)
+    gift = await crud_gifts.get_by_id(session, gift_id)
     if gift is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Gift not found",
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Gift not found")
 
-    if gift in current_user.favorites:
-        current_user.favorites.remove(gift)
-        is_favorite = False
-    else:
-        current_user.favorites.append(gift)
-        is_favorite = True
-
-    await session.commit()
-    await session.refresh(gift)
-
+    is_favorite = await crud_favorites.toggle(session=session, user=current_user, gift=gift)
     return GiftRead.model_validate(gift, from_attributes=True).model_copy(update={"is_favorite": is_favorite})
