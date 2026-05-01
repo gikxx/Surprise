@@ -12,6 +12,7 @@ class GiftBase(BaseModel):
     description: Optional[str] = None
     price: int = Field(..., ge=0)
     image_url: HttpUrl
+    image_type: str = "photo"
     store_name: Optional[str] = None
     store_url: Optional[HttpUrl] = None
 

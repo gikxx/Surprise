@@ -26,6 +26,7 @@ class Gift(Base):
     description: Mapped[Optional[str]] = mapped_column(Text)
     price: Mapped[int] = mapped_column(Integer, nullable=False)
     image_url: Mapped[str] = mapped_column(String(1024), nullable=False)
+    image_type: Mapped[str] = mapped_column(String(16), nullable=False, default="photo")
     store_name: Mapped[Optional[str]] = mapped_column(String(255))
     store_url: Mapped[Optional[str]] = mapped_column(String(1024))
     created_at: Mapped[datetime] = mapped_column(

@@ -35,6 +35,7 @@ struct GiftReadDTO: Decodable {
     let price: Int
     let categories: [CategoryReadDTO]
     let imageURL: String
+    let imageTypeRaw: String?
     let images: [GiftImageDTO]?
     let storeName: String?
     let storeURL: String?
@@ -43,20 +44,23 @@ struct GiftReadDTO: Decodable {
 
     enum CodingKeys: String, CodingKey {
         case id, name, description, price, categories, images
-        case imageURL = "image_url"
-        case storeName = "store_name"
-        case storeURL = "store_url"
-        case createdAt = "created_at"
-        case isFavorite = "is_favorite"
+        case imageURL     = "image_url"
+        case imageTypeRaw = "image_type"
+        case storeName    = "store_name"
+        case storeURL     = "store_url"
+        case createdAt    = "created_at"
+        case isFavorite   = "is_favorite"
     }
 
     func toDomain() -> Gift {
-        Gift(
+        let imageType = ImageType(rawValue: imageTypeRaw ?? "photo") ?? .photo
+        return Gift(
             id: id,
             name: name,
             description: description,
             price: price,
             imageURL: imageURL,
+            imageType: imageType,
             storeName: storeName,
             storeURL: storeURL,
             createdAt: createdAt,
