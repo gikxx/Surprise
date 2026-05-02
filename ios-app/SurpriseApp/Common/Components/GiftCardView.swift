@@ -85,10 +85,12 @@ final class GiftCardView: UIView {
     func configure(with gift: Gift) {
         nameLabel.text = gift.name
         priceLabel.text = "\(Int(gift.price))₽"
-        favoriteButton.tintColor = gift.isFavorite ? .appFavActive : .appBackground
 
         currentImageType = gift.imageType
         applyLayoutStyle(for: gift.imageType)
+
+        // Ставим тинт после applyLayoutStyle, чтобы состояние isFavorite не перетиралось
+        favoriteButton.tintColor = gift.isFavorite ? .appFavActive : favoriteDefaultTint(for: gift.imageType)
 
         imageLoadTask?.cancel()
         currentImageURL = gift.imageURL
@@ -98,14 +100,18 @@ final class GiftCardView: UIView {
             guard let self = self else { return }
             guard self.currentImageURL == gift.imageURL else { return }
             let loaded = image ?? UIImage(named: "gift_placeholder")
-            self.imageView.image = loaded
-            if self.currentImageType == .photo, let loaded = loaded {
-                self.applyPhotoTextStyle(for: loaded)
+            if self.currentImageType == .transparent, let loaded = loaded {
+                self.imageView.image = loaded.withBottomPadding(90)
+            } else {
+                self.imageView.image = loaded
+                if self.currentImageType == .photo, let loaded = loaded {
+                    self.applyPhotoTextStyle(for: loaded)
+                }
             }
         }
     }
 
-    /// Переключает layout-стиль до загрузки картинки.
+    /// Переключает layout-стиль до загрузки картинки (не трогает favoriteButton).
     private func applyLayoutStyle(for type: ImageType) {
         switch type {
         case .photo:
@@ -114,15 +120,18 @@ final class GiftCardView: UIView {
             gradientLayer.isHidden = false
             nameLabel.textColor = .appWhite
             priceLabel.textColor = .appWhite
-            favoriteButton.tintColor = .appBackground
         case .transparent:
             imageView.contentMode = .scaleAspectFit
             imageView.backgroundColor = .appWhite
             gradientLayer.isHidden = true
             nameLabel.textColor = .appTextMain
             priceLabel.textColor = .appTextMain
-            favoriteButton.tintColor = .appTextMain
         }
+    }
+
+    /// Цвет сердечка по умолчанию (когда не в избранном) зависит от типа карточки.
+    private func favoriteDefaultTint(for type: ImageType) -> UIColor {
+        .appBackground
     }
 
     /// Для photo-типа уточняем цвет текста по яркости нижней части загруженного фото.

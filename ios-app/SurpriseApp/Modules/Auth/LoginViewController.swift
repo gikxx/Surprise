@@ -3,9 +3,19 @@ import UIKit
 final class LoginViewController: UIViewController {
     var onLoginSuccess: (() -> Void)?
     var onNoAccount: (() -> Void)?
-    
+    var onBack: (() -> Void)?
+
     private let viewModel: AuthViewModelProtocol
-    
+    private let shouldShowBackButton: Bool
+
+    private let backButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "back_icon"), for: .normal)
+        button.tintColor = .appSecondary
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "ВХОД"
@@ -14,15 +24,16 @@ final class LoginViewController: UIViewController {
         label.textAlignment = .center
         return label
     }()
-    
+
     private let phoneEmailField = UITextField.createWithLabel(title: "почта/номер телефона")
     private let passwordField = UITextField.createWithLabel(title: "пароль", isSecure: true)
-    
+
     private let loginButton = UIButton.createPrimary(title: "вход")
     private let noAccountButton = UIButton.createPrimary(title: "нет аккаунта")
-    
-    init(viewModel: AuthViewModelProtocol) {
+
+    init(viewModel: AuthViewModelProtocol, shouldShowBackButton: Bool = false) {
         self.viewModel = viewModel
+        self.shouldShowBackButton = shouldShowBackButton
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -34,8 +45,12 @@ final class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .appBackground
+        navigationItem.hidesBackButton = true
         setupUI()
         setupKeyboardHandling()
+        if shouldShowBackButton {
+            setupBackButton()
+        }
     }
     
     private func setupUI() {
@@ -121,7 +136,23 @@ final class LoginViewController: UIViewController {
     @objc private func didTapNoAccount() {
         onNoAccount?()
     }
-    
+
+    @objc private func didTapBack() {
+        onBack?()
+    }
+
+    private func setupBackButton() {
+        view.addSubview(backButton)
+        view.bringSubviewToFront(backButton)
+        NSLayoutConstraint.activate([
+            backButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
+            backButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            backButton.widthAnchor.constraint(equalToConstant: 40),
+            backButton.heightAnchor.constraint(equalToConstant: 40)
+        ])
+        backButton.addTarget(self, action: #selector(didTapBack), for: .touchUpInside)
+    }
+
     @objc private func dismissKeyboard() {
         view.endEditing(true)
     }
