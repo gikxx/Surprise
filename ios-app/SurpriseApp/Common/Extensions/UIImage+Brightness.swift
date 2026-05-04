@@ -3,7 +3,7 @@ import UIKit
 extension UIImage {
     /// Добавляет белые пиксели снизу — для transparent-карточек, чтобы продукт поднялся вверх при scaleAspectFit
     func withBottomPadding(_ padding: CGFloat) -> UIImage {
-        let newSize = CGSize(width: size.width, height: size.height + padding * scale)
+        let newSize = CGSize(width: size.width, height: size.height + padding)
         UIGraphicsBeginImageContextWithOptions(newSize, false, scale)
         UIColor.white.setFill()
         UIRectFill(CGRect(origin: .zero, size: newSize))

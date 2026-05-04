@@ -12,7 +12,7 @@
 		</dict>
 	</array>
 	<key>API_BASE_URL</key>
-	<string>http://81.26.181.220</string>
+	<string>https://surprise-api.duckdns.org</string>
 	<key>APPMETRICA_API_KEY</key>
 	<string>a5cbde0a-e409-4de9-8243-41659c6e43ce</string>
 	<key>NSCameraUsageDescription</key>

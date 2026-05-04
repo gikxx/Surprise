@@ -75,6 +75,8 @@ final class FeedViewModel: FeedViewModelProtocol {
 
     // MARK: - Callbacks
     var onStateChanged: (() -> Void)?
+    /// Вызывается только при лайке — без полной перезагрузки коллекции.
+    var onFavoriteToggled: ((Int, Bool) -> Void)?
 
     // MARK: - Init
     init(
@@ -203,32 +205,33 @@ final class FeedViewModel: FeedViewModelProtocol {
         Task {
             do {
                 try await favoritesService.toggleFavorite(id: giftId)
-                let newIsFavorite = favoritesService.isFavorite(id: giftId)
 
-                // Точечно обновляем isFavorite в обеих коллекциях, не подменяя
-                // их целиком. Раньше self.allGifts = updated затирал «всё»
-                // отфильтрованной выборкой, и после тапа «все» возвращалась
-                // только текущая категория.
-                let updatedDisplayed = self.gifts.map { gift -> Gift in
-                    var copy = gift
-                    if gift.id == giftId { copy.isFavorite = newIsFavorite }
-                    return copy
-                }
-                let updatedAll = self.allGifts.map { gift -> Gift in
-                    var copy = gift
-                    if gift.id == giftId { copy.isFavorite = newIsFavorite }
-                    return copy
-                }
-                let updatedCategory = self.categoryGifts.map { gift -> Gift in
-                    var copy = gift
-                    if gift.id == giftId { copy.isFavorite = newIsFavorite }
-                    return copy
-                }
-
+                // isFavorite читаем на MainActor — для гостей toggleFavorite
+                // обновляет favoriteIds через MainActor.run, и чтение из
+                // фонового потока может поймать гонку (стale значение).
                 await MainActor.run {
-                    self.allGifts = updatedAll
-                    self.categoryGifts = updatedCategory
-                    updateGiftsState(updatedDisplayed)
+                    let newIsFavorite = self.favoritesService.isFavorite(id: giftId)
+
+                    // Точечно обновляем isFavorite в обеих коллекциях, не подменяя
+                    // их целиком.
+                    self.gifts = self.gifts.map { gift -> Gift in
+                        var copy = gift
+                        if gift.id == giftId { copy.isFavorite = newIsFavorite }
+                        return copy
+                    }
+                    self.allGifts = self.allGifts.map { gift -> Gift in
+                        var copy = gift
+                        if gift.id == giftId { copy.isFavorite = newIsFavorite }
+                        return copy
+                    }
+                    self.categoryGifts = self.categoryGifts.map { gift -> Gift in
+                        var copy = gift
+                        if gift.id == giftId { copy.isFavorite = newIsFavorite }
+                        return copy
+                    }
+
+                    // Не вызываем onStateChanged — коллекцию не перезагружаем
+                    self.onFavoriteToggled?(giftId, newIsFavorite)
                     Toast.show(
                         newIsFavorite
                             ? "Подарок добавлен в избранное"

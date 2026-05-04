@@ -48,7 +48,7 @@ final class AuthViewModel: AuthViewModelProtocol {
     ) {
         isLoading = true
         errorMessage = nil
-        
+
         Task {
             do {
                 let response = try await authService.register(
@@ -60,6 +60,14 @@ final class AuthViewModel: AuthViewModelProtocol {
                     self.isLoading = false
                     self.errorMessage = nil
                     completion(.success(response.user))
+                }
+            } catch let error as ValidationError {
+                // Пустое имя, короткий пароль, неверный формат email/телефона
+                let message = error.errorDescription ?? "Ошибка валидации"
+                await MainActor.run {
+                    self.isLoading = false
+                    self.errorMessage = message
+                    completion(.failure(.validationFailed(message)))
                 }
             } catch let error as AuthError {
                 await MainActor.run {
@@ -103,7 +111,7 @@ final class AuthViewModel: AuthViewModelProtocol {
     ) {
         isLoading = true
         errorMessage = nil
-        
+
         Task {
             do {
                 let response = try await authService.login(
@@ -114,6 +122,14 @@ final class AuthViewModel: AuthViewModelProtocol {
                     self.isLoading = false
                     self.errorMessage = nil
                     completion(.success(response.user))
+                }
+            } catch let error as ValidationError {
+                // Пустое поле, неверный формат email/телефона, короткий пароль
+                let message = error.errorDescription ?? "Ошибка валидации"
+                await MainActor.run {
+                    self.isLoading = false
+                    self.errorMessage = message
+                    completion(.failure(.validationFailed(message)))
                 }
             } catch let error as AuthError {
                 await MainActor.run {

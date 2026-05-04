@@ -106,6 +106,10 @@ final class AuthService: AuthServiceProtocol {
             return response
         } catch let error as NetworkError {
             AnalyticsService.shared.logCriticalError(scenario: "login", error: error)
+            // 401 на эндпоинте логина = неверные учётные данные, а не истёкшая сессия
+            if case .unauthorized = error {
+                throw AuthError.invalidCredentials
+            }
             throw AuthError.network(error)
         } catch {
             AnalyticsService.shared.logCriticalError(scenario: "login", error: error)

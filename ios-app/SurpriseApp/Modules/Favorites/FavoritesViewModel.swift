@@ -7,6 +7,9 @@ protocol FavoritesViewModelProtocol: AnyObject {
     /// Вызывается когда подарок удалён из UI (до истечения таймера).
     /// Параметр — giftId, чтобы ViewController мог показать undo-баннер.
     var onRemovalPending: ((Int) -> Void)? { get set }
+    /// Точечные колбэки для удаления/вставки без reloadData.
+    var onItemRemoved: ((Int) -> Void)? { get set }
+    var onItemInserted: ((Int) -> Void)? { get set }
 
     func loadFavorites()
     func removeFromFavorites(_ giftId: Int)
@@ -33,6 +36,8 @@ final class FavoritesViewModel: FavoritesViewModelProtocol {
 
     var onStateChanged: (() -> Void)?
     var onRemovalPending: ((Int) -> Void)?
+    var onItemRemoved: ((Int) -> Void)?
+    var onItemInserted: ((Int) -> Void)?
 
     private var pendingRemovals: [Int: PendingRemoval] = [:]
 
@@ -57,9 +62,19 @@ final class FavoritesViewModel: FavoritesViewModelProtocol {
                 if favoriteGifts.isEmpty {
                     let allGifts = try await repository.getAllGifts()
                     let localIds = favoritesService.getFavoriteIds()
-                    resolvedFavorites = allGifts.filter { localIds.contains($0.id) }
+                    resolvedFavorites = allGifts
+                        .filter { localIds.contains($0.id) }
+                        .map { gift in
+                            var copy = gift
+                            copy.isFavorite = true
+                            return copy
+                        }
                 } else {
-                    resolvedFavorites = favoriteGifts
+                    resolvedFavorites = favoriteGifts.map { gift in
+                        var copy = gift
+                        copy.isFavorite = true
+                        return copy
+                    }
                 }
 
                 await MainActor.run {
@@ -81,7 +96,7 @@ final class FavoritesViewModel: FavoritesViewModelProtocol {
 
         items.remove(at: index)
         isEmpty = items.isEmpty
-        onStateChanged?()
+        onItemRemoved?(index)
 
         onRemovalPending?(giftId)
 
@@ -128,6 +143,6 @@ final class FavoritesViewModel: FavoritesViewModelProtocol {
         let insertAt = min(pending.originalIndex, items.count)
         items.insert(pending.gift, at: insertAt)
         isEmpty = false
-        onStateChanged?()
+        onItemInserted?(insertAt)
     }
 }

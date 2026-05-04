@@ -65,7 +65,7 @@ final class PersonsViewModel: PersonsViewModelProtocol {
     }
 
     func deletePerson(at index: Int) {
-        guard index < persons.count else { return }
+        guard index >= 0, index < persons.count else { return }
         let person = persons[index]
 
         // Оптимистичное удаление из UI

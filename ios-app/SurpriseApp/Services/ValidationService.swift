@@ -1,12 +1,13 @@
 import Foundation
 
-enum ValidationError: LocalizedError {
+enum ValidationError: LocalizedError, Equatable {
     case emptyName
     case invalidEmail
     case invalidPhone
+    case invalidEmailOrPhone   // для комбинированного поля почта/телефон
     case shortPassword(minLength: Int)
     case emptyEmailOrPhone
-    
+
     var errorDescription: String? {
         switch self {
         case .emptyName:
@@ -15,6 +16,8 @@ enum ValidationError: LocalizedError {
             return "Введите корректный email"
         case .invalidPhone:
             return "Введите корректный номер телефона (минимум 10 цифр)"
+        case .invalidEmailOrPhone:
+            return "Некорректная почта или номер телефона"
         case .shortPassword(let minLength):
             return "Пароль должен быть не короче \(minLength) символов"
         case .emptyEmailOrPhone:
@@ -63,11 +66,18 @@ final class ValidationService {
         guard !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw ValidationError.emptyEmailOrPhone
         }
-        
+
         if value.contains("@") {
-            try validateEmail(value)
+            let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
+            let emailPredicate = NSPredicate(format: "SELF MATCHES %@", emailRegex)
+            if !emailPredicate.evaluate(with: value) {
+                throw ValidationError.invalidEmailOrPhone
+            }
         } else {
-            try validatePhone(value)
+            let digits = value.filter { $0.isNumber }
+            if digits.count < 10 {
+                throw ValidationError.invalidEmailOrPhone
+            }
         }
     }
     

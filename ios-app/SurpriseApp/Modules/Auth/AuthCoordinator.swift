@@ -30,24 +30,45 @@ final class AuthCoordinator: Coordinator {
     
     private func showLogin() {
         let viewModel = AuthViewModel(authService: AuthService())
-        let vc = LoginViewController(viewModel: viewModel)
+        let vc = LoginViewController(viewModel: viewModel, shouldShowBackButton: true)
         vc.onLoginSuccess = { [weak self] in
             self?.onFinish?()
         }
         vc.onNoAccount = { [weak self] in
-            self?.showRegistration()
+            self?.showRegistrationFromLogin()
+        }
+        vc.onBack = { [weak self] in
+            self?.navigationController.popViewController(animated: true)
         }
         navigationController.pushViewController(vc, animated: true)
     }
-    
+
     private func showRegistration() {
         let viewModel = AuthViewModel(authService: AuthService())
-        let vc = RegistrationViewController(viewModel: viewModel)
+        let vc = RegistrationViewController(viewModel: viewModel, shouldShowBackButton: true)
         vc.onContinue = { [weak self] in self?.showSuccess() }
         vc.onSkip = { [weak self] in
             AuthManager.shared.setGuestSession()
             self?.onFinish?()
-        } // Уходим на ленту
+        }
+        vc.onBack = { [weak self] in
+            self?.navigationController.popViewController(animated: true)
+        }
+        navigationController.pushViewController(vc, animated: true)
+    }
+
+    // Регистрация из экрана логина — показываем кнопку назад
+    private func showRegistrationFromLogin() {
+        let viewModel = AuthViewModel(authService: AuthService())
+        let vc = RegistrationViewController(viewModel: viewModel, shouldShowBackButton: true)
+        vc.onContinue = { [weak self] in self?.showSuccess() }
+        vc.onSkip = { [weak self] in
+            AuthManager.shared.setGuestSession()
+            self?.onFinish?()
+        }
+        vc.onBack = { [weak self] in
+            self?.navigationController.popViewController(animated: true)
+        }
         navigationController.pushViewController(vc, animated: true)
     }
 

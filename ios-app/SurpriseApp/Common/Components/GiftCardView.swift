@@ -16,6 +16,10 @@ final class GiftCardView: UIView {
     // MARK: - Gradient
     private let gradientLayer = CAGradientLayer()
 
+    // MARK: - Layout
+    private var photoConstraints: [NSLayoutConstraint] = []
+    private var transparentConstraints: [NSLayoutConstraint] = []
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -31,6 +35,7 @@ final class GiftCardView: UIView {
     private func setupUI() {
         backgroundColor = .appWhite
         layer.cornerRadius = 42
+        clipsToBounds = true
 
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
@@ -40,6 +45,8 @@ final class GiftCardView: UIView {
         gradientLayer.locations = [0.45, 1.0]
         gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.0)
         gradientLayer.endPoint = CGPoint(x: 0.5, y: 1.0)
+        gradientLayer.actions = ["hidden": NSNull()]
+        imageView.layer.addSublayer(gradientLayer)
 
         nameLabel.font = .helveticaRegular(size: 13)
         nameLabel.textColor = .appTextMain
@@ -55,31 +62,48 @@ final class GiftCardView: UIView {
         favoriteButton.addTarget(self, action: #selector(didTapFavorite), for: .touchUpInside)
         favoriteButton.translatesAutoresizingMaskIntoConstraints = false
 
+        // Все subviews — дети self, не imageView
         addSubview(imageView)
-        imageView.layer.addSublayer(gradientLayer)
-        imageView.addSubview(nameLabel)
-        imageView.addSubview(priceLabel)
-        imageView.addSubview(favoriteButton)
+        addSubview(nameLabel)
+        addSubview(priceLabel)
+        addSubview(favoriteButton)
 
+        // Базовые constraints (всегда активны)
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: topAnchor),
             imageView.leadingAnchor.constraint(equalTo: leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            imageView.bottomAnchor.constraint(equalTo: bottomAnchor),
 
-            favoriteButton.trailingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -21),
-            favoriteButton.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -30),
+            favoriteButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -21),
             favoriteButton.widthAnchor.constraint(equalToConstant: 32),
             favoriteButton.heightAnchor.constraint(equalToConstant: 32),
+        ])
 
-            priceLabel.leadingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 16),
-            priceLabel.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -46),
-
-            nameLabel.leadingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 16),
+        // Photo: imageView заполняет всю карточку, текст поверх с градиентом
+        photoConstraints = [
+            imageView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            priceLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            priceLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -46),
+            nameLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             nameLabel.trailingAnchor.constraint(equalTo: favoriteButton.leadingAnchor, constant: -4),
             nameLabel.topAnchor.constraint(equalTo: priceLabel.bottomAnchor, constant: 2),
-            nameLabel.bottomAnchor.constraint(lessThanOrEqualTo: imageView.bottomAnchor, constant: -10)
-        ])
+            nameLabel.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -10),
+            favoriteButton.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -30),
+        ]
+
+        // Transparent: imageView занимает верхние 65%, текст в нижней части
+        transparentConstraints = [
+            imageView.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.65),
+            priceLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            priceLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
+            nameLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            nameLabel.trailingAnchor.constraint(equalTo: favoriteButton.leadingAnchor, constant: -4),
+            nameLabel.topAnchor.constraint(equalTo: priceLabel.bottomAnchor, constant: 2),
+            nameLabel.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -8),
+            favoriteButton.centerYAnchor.constraint(equalTo: priceLabel.centerYAnchor),
+        ]
+
+        NSLayoutConstraint.activate(photoConstraints)
     }
 
     func configure(with gift: Gift) {
@@ -87,10 +111,12 @@ final class GiftCardView: UIView {
         priceLabel.text = "\(Int(gift.price))₽"
 
         currentImageType = gift.imageType
-        applyLayoutStyle(for: gift.imageType)
+        UIView.performWithoutAnimation {
+            applyLayoutStyle(for: gift.imageType)
+            layoutIfNeeded()
+        }
 
-        // Ставим тинт после applyLayoutStyle, чтобы состояние isFavorite не перетиралось
-        favoriteButton.tintColor = gift.isFavorite ? .appFavActive : favoriteDefaultTint(for: gift.imageType)
+        favoriteButton.tintColor = gift.isFavorite ? .appFavActive : .appBackground
 
         imageLoadTask?.cancel()
         currentImageURL = gift.imageURL
@@ -100,38 +126,33 @@ final class GiftCardView: UIView {
             guard let self = self else { return }
             guard self.currentImageURL == gift.imageURL else { return }
             let loaded = image ?? UIImage(named: "gift_placeholder")
-            if self.currentImageType == .transparent, let loaded = loaded {
-                self.imageView.image = loaded.withBottomPadding(90)
-            } else {
-                self.imageView.image = loaded
-                if self.currentImageType == .photo, let loaded = loaded {
-                    self.applyPhotoTextStyle(for: loaded)
-                }
+            self.imageView.image = loaded
+            if self.currentImageType == .photo, let loaded = loaded {
+                self.applyPhotoTextStyle(for: loaded)
             }
         }
     }
 
-    /// Переключает layout-стиль до загрузки картинки (не трогает favoriteButton).
+    /// Переключает layout-стиль (не трогает favoriteButton.tintColor).
     private func applyLayoutStyle(for type: ImageType) {
         switch type {
         case .photo:
+            NSLayoutConstraint.deactivate(transparentConstraints)
+            NSLayoutConstraint.activate(photoConstraints)
             imageView.contentMode = .scaleAspectFill
             imageView.backgroundColor = .clear
             gradientLayer.isHidden = false
             nameLabel.textColor = .appWhite
             priceLabel.textColor = .appWhite
         case .transparent:
+            NSLayoutConstraint.deactivate(photoConstraints)
+            NSLayoutConstraint.activate(transparentConstraints)
             imageView.contentMode = .scaleAspectFit
             imageView.backgroundColor = .appWhite
             gradientLayer.isHidden = true
             nameLabel.textColor = .appTextMain
             priceLabel.textColor = .appTextMain
         }
-    }
-
-    /// Цвет сердечка по умолчанию (когда не в избранном) зависит от типа карточки.
-    private func favoriteDefaultTint(for type: ImageType) -> UIColor {
-        .appBackground
     }
 
     /// Для photo-типа уточняем цвет текста по яркости нижней части загруженного фото.

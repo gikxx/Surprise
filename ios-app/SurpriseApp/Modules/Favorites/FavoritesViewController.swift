@@ -138,6 +138,18 @@ final class FavoritesViewController: UIViewController {
         viewModel.onRemovalPending = { [weak self] giftId in
             self?.showUndoBanner(for: giftId)
         }
+
+        viewModel.onItemRemoved = { [weak self] index in
+            guard let self else { return }
+            self.emptyLabel.isHidden = !self.viewModel.isEmpty
+            self.collectionView.deleteItems(at: [IndexPath(item: index, section: 0)])
+        }
+
+        viewModel.onItemInserted = { [weak self] index in
+            guard let self else { return }
+            self.emptyLabel.isHidden = !self.viewModel.isEmpty
+            self.collectionView.insertItems(at: [IndexPath(item: index, section: 0)])
+        }
     }
 
     // MARK: - Undo Banner

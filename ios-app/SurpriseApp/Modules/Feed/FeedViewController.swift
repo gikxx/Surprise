@@ -213,6 +213,14 @@ final class FeedViewController: UIViewController {
             feedViewModel.onStateChanged = { [weak self] in
                 self?.applyState()
             }
+            feedViewModel.onFavoriteToggled = { [weak self] giftId, isFavorite in
+                guard let self else { return }
+                guard let index = self.viewModel.gifts.firstIndex(where: { $0.id == giftId }) else { return }
+                let indexPath = IndexPath(item: index, section: 0)
+                if let cell = self.collectionView.cellForItem(at: indexPath) as? GiftCell {
+                    cell.updateFavoriteState(isFavorite)
+                }
+            }
         }
     }
     

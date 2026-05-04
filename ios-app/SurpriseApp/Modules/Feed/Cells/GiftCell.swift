@@ -31,6 +31,10 @@ final class GiftCell: UICollectionViewCell {
     func configure(with gift: Gift) {
         cardView.configure(with: gift)
     }
+
+    func updateFavoriteState(_ isFavorite: Bool) {
+        cardView.favoriteButton.tintColor = isFavorite ? .appFavActive : .appBackground
+    }
     
     override func prepareForReuse() {
         super.prepareForReuse()

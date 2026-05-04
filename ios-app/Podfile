@@ -2,6 +2,10 @@ platform :ios, '18.6'
 target 'SurpriseApp' do
   use_frameworks!
   pod 'YandexMobileMetrica', '~> 4.5'
+
+  target 'SurpriseAppTests' do
+    inherit! :search_paths
+  end
 end
 
 post_install do |installer|

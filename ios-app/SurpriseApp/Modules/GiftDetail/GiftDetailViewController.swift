@@ -333,11 +333,19 @@ final class GiftDetailViewController: UIViewController {
         fullDescriptionText = gift.description ?? ""
         isDescriptionExpanded = false
         updateDescriptionState(animated: false)
-        
+
+        if gift.imageType == .transparent {
+            imageView.contentMode = .scaleAspectFit
+            topCardView.backgroundColor = .appWhite
+        } else {
+            imageView.contentMode = .scaleAspectFill
+            topCardView.backgroundColor = .clear
+        }
+
         ImageLoader.shared.loadImage(from: gift.imageURL) { [weak self] image in
             self?.imageView.image = image ?? UIImage(named: "gift_placeholder")
         }
-        
+
         updateFavoriteState()
     }
     

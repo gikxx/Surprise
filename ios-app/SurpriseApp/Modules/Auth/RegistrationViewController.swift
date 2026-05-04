@@ -16,14 +16,6 @@ final class RegistrationViewController: UIViewController {
         return label
     }()
     
-    // TODO: - вынести куда-то эту кнопку, а то везде повторяется
-    private let backButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "back_icon"), for: .normal)
-        button.tintColor = .appSecondary
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
 
     // Поля с заголовками (контейнеры с UILabel + UITextField внутри)
     private let phoneEmailField = UITextField.createWithLabel(title: "почта/номер телефона")
@@ -54,6 +46,11 @@ final class RegistrationViewController: UIViewController {
         if shouldShowBackButton {
             setupBackButton()
         }
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
     }
 
     private func setupUI() {
@@ -111,15 +108,18 @@ final class RegistrationViewController: UIViewController {
     }
     
     private func setupBackButton() {
-        view.addSubview(backButton)
-        view.bringSubviewToFront(backButton)
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "back_icon"), for: .normal)
+        button.tintColor = .appSecondary
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(didTapBack), for: .touchUpInside)
+        view.addSubview(button)
         NSLayoutConstraint.activate([
-            backButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
-            backButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            backButton.widthAnchor.constraint(equalToConstant: 40),
-            backButton.heightAnchor.constraint(equalToConstant: 40)
+            button.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            button.widthAnchor.constraint(equalToConstant: 40),
+            button.heightAnchor.constraint(equalToConstant: 40)
         ])
-        backButton.addTarget(self, action: #selector(didTapBack), for: .touchUpInside)
     }
         
         

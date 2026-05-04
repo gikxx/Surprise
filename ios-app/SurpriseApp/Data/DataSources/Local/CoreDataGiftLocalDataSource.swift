@@ -79,6 +79,7 @@ final class CoreDataGiftLocalDataSource: GiftLocalDataSourceProtocol {
             description: entity.desc,
             price: Int(entity.price),
             imageURL: imageURL,
+            imageType: .photo,
             storeName: entity.storeName,
             storeURL: entity.storeURL,
             createdAt: entity.createdAt ?? Date(),

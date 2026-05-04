@@ -19,12 +19,17 @@ ios-app/DerivedData/
 
 # Python / Backend
 backend/.venv/
+backend/.venv_test/
 backend/__pycache__/
 backend/.idea/
+backend/.coverage
 __pycache__/
 *.pyc
 backend/.env
 .idea/
+
+# Misc artifacts
+surprise@localhost.png
 
 # CocoaPods
 ios-app/Pods/

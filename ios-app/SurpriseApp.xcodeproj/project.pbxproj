@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		900A97ABFED705E9E2FAD711 /* Pods_SurpriseApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E37B3F02CD9296E2CE7C908 /* Pods_SurpriseApp.framework */; };
+		A72CB83355280D81522ADD39 /* Pods_SurpriseAppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E71485E21F826D41B68F3A8 /* Pods_SurpriseAppTests.framework */; };
 		D5205D322FABD02500337A80 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D5205D312FABD02400337A80 /* WidgetKit.framework */; };
 		D5205D342FABD02500337A80 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D5205D332FABD02500337A80 /* SwiftUI.framework */; };
 		D5205D432FABD02500337A80 /* SurpriseWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D5205D302FABD02400337A80 /* SurpriseWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -21,6 +22,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = D5205D2F2FABD02400337A80;
 			remoteInfo = SurpriseWidgetExtension;
+		};
+		D5C81DC72FB22DDF00BEBE91 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D51D0B6E2F214C4400F7D69E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D51D0B752F214C4400F7D69E;
+			remoteInfo = SurpriseApp;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -41,12 +49,16 @@
 /* Begin PBXFileReference section */
 		10BA8398D3D3B9784BEE305A /* Pods-SurpriseApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SurpriseApp.debug.xcconfig"; path = "Target Support Files/Pods-SurpriseApp/Pods-SurpriseApp.debug.xcconfig"; sourceTree = "<group>"; };
 		190166763F5BBBF3C843CB97 /* Pods-SurpriseApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SurpriseApp.release.xcconfig"; path = "Target Support Files/Pods-SurpriseApp/Pods-SurpriseApp.release.xcconfig"; sourceTree = "<group>"; };
+		25D80AAE09AD4492718844F9 /* Pods-SurpriseAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SurpriseAppTests.debug.xcconfig"; path = "Target Support Files/Pods-SurpriseAppTests/Pods-SurpriseAppTests.debug.xcconfig"; sourceTree = "<group>"; };
 		5E37B3F02CD9296E2CE7C908 /* Pods_SurpriseApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SurpriseApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7E71485E21F826D41B68F3A8 /* Pods_SurpriseAppTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SurpriseAppTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F0C0F98B0AA74375400459B /* Pods-SurpriseAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SurpriseAppTests.release.xcconfig"; path = "Target Support Files/Pods-SurpriseAppTests/Pods-SurpriseAppTests.release.xcconfig"; sourceTree = "<group>"; };
 		D51D0B762F214C4400F7D69E /* SurpriseApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SurpriseApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5205D302FABD02400337A80 /* SurpriseWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SurpriseWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5205D312FABD02400337A80 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		D5205D332FABD02500337A80 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		D5205D492FABD05F00337A80 /* SurpriseWidgetExtensionDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SurpriseWidgetExtensionDebug.entitlements; sourceTree = "<group>"; };
+		D5C81DC32FB22DDF00BEBE91 /* SurpriseAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SurpriseAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5FA0EBB2FACD3AF002CA83A /* SurpriseWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SurpriseWidgetExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -84,6 +96,11 @@
 			path = SurpriseWidget;
 			sourceTree = "<group>";
 		};
+		D5C81DC42FB22DDF00BEBE91 /* SurpriseAppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SurpriseAppTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +122,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D5C81DC02FB22DDF00BEBE91 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A72CB83355280D81522ADD39 /* Pods_SurpriseAppTests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -113,6 +138,8 @@
 			children = (
 				10BA8398D3D3B9784BEE305A /* Pods-SurpriseApp.debug.xcconfig */,
 				190166763F5BBBF3C843CB97 /* Pods-SurpriseApp.release.xcconfig */,
+				25D80AAE09AD4492718844F9 /* Pods-SurpriseAppTests.debug.xcconfig */,
+				9F0C0F98B0AA74375400459B /* Pods-SurpriseAppTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -124,6 +151,7 @@
 				D5205D492FABD05F00337A80 /* SurpriseWidgetExtensionDebug.entitlements */,
 				D51D0B782F214C4400F7D69E /* SurpriseApp */,
 				D5205D352FABD02500337A80 /* SurpriseWidget */,
+				D5C81DC42FB22DDF00BEBE91 /* SurpriseAppTests */,
 				D51D0B772F214C4400F7D69E /* Products */,
 				3311FAE387A851231762F49B /* Pods */,
 				F047A0EEC9FAB45B298D635E /* Frameworks */,
@@ -135,6 +163,7 @@
 			children = (
 				D51D0B762F214C4400F7D69E /* SurpriseApp.app */,
 				D5205D302FABD02400337A80 /* SurpriseWidgetExtension.appex */,
+				D5C81DC32FB22DDF00BEBE91 /* SurpriseAppTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -145,6 +174,7 @@
 				5E37B3F02CD9296E2CE7C908 /* Pods_SurpriseApp.framework */,
 				D5205D312FABD02400337A80 /* WidgetKit.framework */,
 				D5205D332FABD02500337A80 /* SwiftUI.framework */,
+				7E71485E21F826D41B68F3A8 /* Pods_SurpriseAppTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -191,11 +221,31 @@
 				D5205D352FABD02500337A80 /* SurpriseWidget */,
 			);
 			name = SurpriseWidgetExtension;
-			packageProductDependencies = (
-			);
 			productName = SurpriseWidgetExtension;
 			productReference = D5205D302FABD02400337A80 /* SurpriseWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
+		};
+		D5C81DC22FB22DDF00BEBE91 /* SurpriseAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D5C81DCB2FB22DDF00BEBE91 /* Build configuration list for PBXNativeTarget "SurpriseAppTests" */;
+			buildPhases = (
+				76ACC7C61DD1AFEEE2E40AD5 /* [CP] Check Pods Manifest.lock */,
+				D5C81DBF2FB22DDF00BEBE91 /* Sources */,
+				D5C81DC02FB22DDF00BEBE91 /* Frameworks */,
+				D5C81DC12FB22DDF00BEBE91 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D5C81DC82FB22DDF00BEBE91 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				D5C81DC42FB22DDF00BEBE91 /* SurpriseAppTests */,
+			);
+			name = SurpriseAppTests;
+			productName = SurpriseAppTests;
+			productReference = D5C81DC32FB22DDF00BEBE91 /* SurpriseAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -212,6 +262,10 @@
 					};
 					D5205D2F2FABD02400337A80 = {
 						CreatedOnToolsVersion = 26.1;
+					};
+					D5C81DC22FB22DDF00BEBE91 = {
+						CreatedOnToolsVersion = 26.1;
+						TestTargetID = D51D0B752F214C4400F7D69E;
 					};
 				};
 			};
@@ -231,6 +285,7 @@
 			targets = (
 				D51D0B752F214C4400F7D69E /* SurpriseApp */,
 				D5205D2F2FABD02400337A80 /* SurpriseWidgetExtension */,
+				D5C81DC22FB22DDF00BEBE91 /* SurpriseAppTests */,
 			);
 		};
 /* End PBXProject section */
@@ -250,9 +305,38 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D5C81DC12FB22DDF00BEBE91 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		76ACC7C61DD1AFEEE2E40AD5 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SurpriseAppTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		F59F1F0A4C7988DD3088D742 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -292,6 +376,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D5C81DBF2FB22DDF00BEBE91 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -299,6 +390,11 @@
 			isa = PBXTargetDependency;
 			target = D5205D2F2FABD02400337A80 /* SurpriseWidgetExtension */;
 			targetProxy = D5205D412FABD02500337A80 /* PBXContainerItemProxy */;
+		};
+		D5C81DC82FB22DDF00BEBE91 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D51D0B752F214C4400F7D69E /* SurpriseApp */;
+			targetProxy = D5C81DC72FB22DDF00BEBE91 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -311,7 +407,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = SurpriseApp/SurpriseAppDebug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = 8XRN4B69W4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SurpriseApp/Application/Info.plist;
@@ -325,7 +421,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = hse.surprise;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -350,7 +446,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = SurpriseApp/SurpriseApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = 8XRN4B69W4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SurpriseApp/Application/Info.plist;
@@ -364,7 +460,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = hse.surprise;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -509,7 +605,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = SurpriseWidgetExtensionDebug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 8XRN4B69W4;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -547,7 +643,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = SurpriseWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = 8XRN4B69W4;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -577,6 +673,63 @@
 			};
 			name = Release;
 		};
+		D5C81DC92FB22DDF00BEBE91 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 25D80AAE09AD4492718844F9 /* Pods-SurpriseAppTests.debug.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 8XRN4B69W4;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = hse.SurpriseAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SurpriseApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SurpriseApp";
+			};
+			name = Debug;
+		};
+		D5C81DCA2FB22DDF00BEBE91 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9F0C0F98B0AA74375400459B /* Pods-SurpriseAppTests.release.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8XRN4B69W4;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = hse.SurpriseAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SurpriseApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SurpriseApp";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -603,6 +756,15 @@
 			buildConfigurations = (
 				D5205D452FABD02500337A80 /* Debug */,
 				D5205D462FABD02500337A80 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D5C81DCB2FB22DDF00BEBE91 /* Build configuration list for PBXNativeTarget "SurpriseAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D5C81DC92FB22DDF00BEBE91 /* Debug */,
+				D5C81DCA2FB22DDF00BEBE91 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
