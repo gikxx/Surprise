@@ -230,13 +230,9 @@ final class ProfileCoordinator: Coordinator {
     }
 
     private func showSupportInfo() {
-        let alert = UIAlertController(
-            title: "Поддержка",
-            message: "Напишите нам на getmanovakarina@gmail.com",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "Ок", style: .default))
-        navigationController.topViewController?.present(alert, animated: true)
+        let sheet = SupportBottomSheet()
+        sheet.modalPresentationStyle = .pageSheet
+        navigationController.topViewController?.present(sheet, animated: true)
     }
 
     private func showClientInfo() {
