@@ -21,6 +21,10 @@ final class GiftRemoteDataSource: GiftRemoteDataSourceProtocol {
     }
 
     func fetchRecommended(page: Int, perPage: Int) async throws -> [Gift] {
+        try await fetchRecommendedPage(page: page, perPage: perPage).gifts
+    }
+
+    func fetchRecommendedPage(page: Int, perPage: Int) async throws -> GiftPage {
         let endpoint = Endpoint(
             path: "/gifts/recommended",
             method: .get,
@@ -30,7 +34,12 @@ final class GiftRemoteDataSource: GiftRemoteDataSourceProtocol {
             ]
         )
         let response: GiftListResponseDTO = try await networkService.request(endpoint)
-        return response.gifts.map { $0.toDomain() }
+        return GiftPage(
+            gifts: response.gifts.map { $0.toDomain() },
+            total: response.total,
+            page: response.page,
+            perPage: response.perPage
+        )
     }
 
     func search(query: String, page: Int, perPage: Int) async throws -> [Gift] {

@@ -23,3 +23,15 @@ struct Gift: Identifiable, Equatable {
 
     var isFavorite: Bool = false
 }
+
+// MARK: - GiftPage
+/// Результат одного страничного запроса к серверу.
+struct GiftPage {
+    let gifts: [Gift]
+    let total: Int
+    let page: Int
+    let perPage: Int
+
+    /// Есть ли ещё страницы для загрузки.
+    var hasMore: Bool { page * perPage < total }
+}

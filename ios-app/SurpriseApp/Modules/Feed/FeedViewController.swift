@@ -221,6 +221,15 @@ final class FeedViewController: UIViewController {
                     cell.updateFavoriteState(isFavorite)
                 }
             }
+            feedViewModel.onItemsAppended = { [weak self] count in
+                guard let self, count > 0 else { return }
+                // viewModel.gifts уже содержит новые элементы;
+                // collectionView ещё не знает о них — передаём новые индексы.
+                let newTotal = self.viewModel.gifts.count
+                let startIndex = newTotal - count
+                let indexPaths = (startIndex..<newTotal).map { IndexPath(item: $0, section: 0) }
+                self.collectionView.insertItems(at: indexPaths)
+            }
         }
     }
     
@@ -460,6 +469,15 @@ extension FeedViewController: UICollectionViewDelegate {
             let gift = viewModel.gifts[indexPath.item]
             onGiftSelected?(gift)
         }
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        willDisplay cell: UICollectionViewCell,
+        forItemAt indexPath: IndexPath
+    ) {
+        guard collectionView == self.collectionView else { return }
+        (viewModel as? PaginatableFeedViewModelProtocol)?.loadMoreIfNeeded(currentIndex: indexPath.item)
     }
 }
 

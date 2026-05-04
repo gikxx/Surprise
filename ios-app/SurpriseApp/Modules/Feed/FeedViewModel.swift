@@ -32,7 +32,7 @@ protocol PaginatableFeedViewModelProtocol: FeedViewModelProtocol {
 }
 
 // MARK: - FeedViewModel
-final class FeedViewModel: FeedViewModelProtocol {
+final class FeedViewModel: PaginatableFeedViewModelProtocol {
 
     // MARK: - Constants
 
@@ -41,6 +41,11 @@ final class FeedViewModel: FeedViewModelProtocol {
     /// отсутствие параметра category_id.
     private static let allCategoriesTitle = "все"
 
+    // MARK: - Pagination constants
+    private static let pageSize = 20
+    /// Сколько ячеек до конца списка запускать подгрузку следующей страницы.
+    private static let prefetchThreshold = 5
+
     // MARK: - Properties
     private(set) var gifts: [Gift] = []
     private(set) var isLoading: Bool = false
@@ -48,6 +53,10 @@ final class FeedViewModel: FeedViewModelProtocol {
     private(set) var isEmpty: Bool = false
     private(set) var canLoadMore: Bool = false
     private(set) var selectedCategoryIndex: Int = 0
+
+    // MARK: - Pagination state
+    private var currentPage: Int = 1
+    private var totalRecommended: Int = 0
 
     /// Источник правды: список категорий с бэка (без "все").
     /// Индекс i в этом массиве == индекс (i + 1) в `categories`.
@@ -77,6 +86,9 @@ final class FeedViewModel: FeedViewModelProtocol {
     var onStateChanged: (() -> Void)?
     /// Вызывается только при лайке — без полной перезагрузки коллекции.
     var onFavoriteToggled: ((Int, Bool) -> Void)?
+    /// Вызывается при подгрузке следующей страницы: передаёт количество
+    /// добавленных элементов, чтобы View вставила их через insertItems, а не reloadData.
+    var onItemsAppended: ((Int) -> Void)?
 
     // MARK: - Init
     init(
@@ -108,6 +120,8 @@ final class FeedViewModel: FeedViewModelProtocol {
     }
 
     func loadInitial() {
+        currentPage = 1
+        totalRecommended = 0
         updateGiftsState([], isLoading: true)
 
         Task {
@@ -124,10 +138,13 @@ final class FeedViewModel: FeedViewModelProtocol {
                 }
             }()
 
-            async let recommendedResult: Result<[Gift], Error> = {
+            async let recommendedResult: Result<GiftPage, Error> = {
                 do {
-                    let gifts = try await repository.getRecommendedGifts()
-                    return .success(gifts)
+                    let page = try await repository.getRecommendedPage(
+                        page: 1,
+                        perPage: Self.pageSize
+                    )
+                    return .success(page)
                 } catch {
                     return .failure(error)
                 }
@@ -140,13 +157,15 @@ final class FeedViewModel: FeedViewModelProtocol {
             let result = await recommendedResult
 
             switch result {
-            case .success(let recommendedGifts):
-                let giftsWithFavorites = applyFavoritesState(to: recommendedGifts)
+            case .success(let page):
+                let giftsWithFavorites = applyFavoritesState(to: page.gifts)
                 await MainActor.run {
+                    self.currentPage = 1
+                    self.totalRecommended = page.total
                     self.allGifts = giftsWithFavorites
                     self.categoryGifts = giftsWithFavorites
                     self.updateGiftsState(self.applyBudgetFilter(giftsWithFavorites))
-                    self.canLoadMore = false
+                    self.canLoadMore = page.hasMore
                 }
             case .failure(let error):
                 AnalyticsService.shared.logCriticalError(scenario: "load_initial", error: error)
@@ -163,12 +182,16 @@ final class FeedViewModel: FeedViewModelProtocol {
         selectedCategoryIndex = index
 
         if index == 0 {
-            // "все" — никакой фильтрации, показываем закешированный allGifts
+            // "все" — показываем закешированный allGifts
+            // canLoadMore восстанавливаем из накопленного total
             categoryGifts = allGifts
             updateGiftsState(applyBudgetFilter(allGifts))
+            canLoadMore = currentPage * Self.pageSize < totalRecommended
             return
         }
 
+        // При переходе в категорию пагинация рекомендаций не нужна
+        canLoadMore = false
         let category = availableCategories[index - 1]
         loadGifts(filteredBy: category)
     }
@@ -180,8 +203,49 @@ final class FeedViewModel: FeedViewModelProtocol {
     }
 
     func loadMoreIfNeeded(currentIndex: Int) {
-        guard canLoadMore, !isLoadingMore else { return }
-        // Пока заглушка для пагинации
+        // Пагинируем только на вкладке «все» без бюджетного фильтра.
+        // При фильтрах/категориях данные уже загружены целиком.
+        guard canLoadMore,
+              !isLoadingMore,
+              selectedCategoryIndex == 0,
+              !activeBudgetFilter.isActive
+        else { return }
+
+        // Запускаем подгрузку, когда пользователь дошёл до предпоследних N ячеек
+        guard currentIndex >= gifts.count - Self.prefetchThreshold else { return }
+
+        isLoadingMore = true
+        let nextPage = currentPage + 1
+
+        Task {
+            do {
+                let page = try await repository.getRecommendedPage(
+                    page: nextPage,
+                    perPage: Self.pageSize
+                )
+                let newGifts = applyFavoritesState(to: page.gifts)
+                await MainActor.run {
+                    self.currentPage = nextPage
+                    self.totalRecommended = page.total
+                    let appendCount = newGifts.count
+
+                    self.allGifts.append(contentsOf: newGifts)
+                    self.categoryGifts.append(contentsOf: newGifts)
+                    self.gifts.append(contentsOf: newGifts)
+                    self.isEmpty = self.gifts.isEmpty
+                    self.canLoadMore = page.hasMore
+                    self.isLoadingMore = false
+
+                    self.onItemsAppended?(appendCount)
+                }
+            } catch {
+                await MainActor.run {
+                    self.isLoadingMore = false
+                    // Не показываем алерт — молча даём возможность попробовать снова
+                    // при следующем скролле
+                }
+            }
+        }
     }
 
     func refreshFavoritesState() {
