@@ -120,8 +120,8 @@
 - **Распространение iOS:** TestFlight (App Store Connect)
 
 ## Как попробовать
- 
 iOS 18.6+, любой iPhone от A12 Bionic.
+Ссылка на App Store - [Surprise App](https://apps.apple.com/app/surprise-app/id6759986088)
 1. Установить **TestFlight** из App Store (если ещё нет)
 2. Перейти по ссылке TestFlight — [Приложение](https://testflight.apple.com/join/GXTNJXu8)
 3. В TestFlight нажать **Установить SURPRISE**
